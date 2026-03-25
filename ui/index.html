@@ -7,13 +7,13 @@
 <style>
 :root{--gd:#204501;--gm:#527B0B;--gb:#73A30A;--gg:linear-gradient(273.6deg,#527B0B 0.88%,#73A30A 94.96%);--bg:#e8eeda;--card:#F4F7EC;--card2:#eef3e2;--white:#fff;--txt:#333;--txt2:rgba(0,0,0,0.5);--txt3:rgba(0,0,0,0.3);--bdr:rgba(32,69,1,0.1);--red:#de3155;--yel:#f4ce4a}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden}
+html,body{height:100%;overflow:hidden;background:var(--bg)!important}
 body{font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;font-size:14px;color:var(--txt);background:var(--bg);-webkit-font-smoothing:antialiased}
-.app{max-width:440px;margin:0 auto;height:100vh;display:flex;flex-direction:column}
-.pages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.pg{display:none;padding:0 0 20px}.pg.on{display:block}
+.app{max-width:440px;margin:0 auto;height:100vh;display:flex;flex-direction:column;background:var(--bg)!important}
+.pages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg)!important}
+.pg{display:none;padding:8px 0 120px}.pg.on{display:block}
 /* Header */
-.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);flex-shrink:0;position:sticky;top:0;z-index:10}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);flex-shrink:0;margin-bottom:6px}
 .hdr-back,.hdr-sp{width:60px}.hdr-sp{pointer-events:none}
 .hdr-back{display:flex;align-items:center;gap:4px;color:var(--gm);font-size:14px;font-weight:700;cursor:pointer;background:none;border:none}
 .hdr-back svg{width:14px;height:14px}
@@ -75,10 +75,10 @@ body{font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;font
 .tb td{padding:9px 5px}.tb tr:nth-child(even){background:rgba(32,69,1,.04)}
 .tb .me{background:rgba(82,123,11,.12)!important}
 /* Toast */
-#tc{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:999;width:90%;max-width:400px;pointer-events:none}
+#tc{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;width:90%;max-width:400px;pointer-events:none}
 .tt{padding:10px 14px;border-radius:10px;margin-bottom:6px;font-size:13px;font-weight:600;pointer-events:auto;animation:si .2s ease}
 .tt.ok{background:#73A30A;color:#fff}.tt.er{background:var(--red);color:#fff}.tt.in{background:#0bccf7;color:#042548}
-@keyframes si{from{transform:translateY(-10px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes si{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
 /* Connect */
 .conn{text-align:center;padding:60px 20px;color:var(--txt2)}
 .conn .sp{display:inline-block;width:24px;height:24px;border:2px solid var(--bdr);border-top-color:var(--gm);border-radius:50%;animation:sn .8s linear infinite;margin-bottom:12px}
@@ -118,13 +118,13 @@ body{font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;font
 </div>
 <div class="grid">
  <div class="ac"><h3>Trove</h3><p id="hTroveP">You haven't borrow any Nephrite yet? To get it you need to open a Trove.</p><button class="btn btn-g btn-s" onclick="go('trove')" id="hTroveB">OPEN</button></div>
- <div class="ac"><h3>Stability Pool</h3><p>Earn BEAMX and BEAM by securing the system</p><button class="btn btn-g btn-s" onclick="go('pool')">DEPOSIT</button></div>
+ <div class="ac"><h3>Stability Pool</h3><p id="hPoolP">Earn BEAMX and BEAM by securing the system</p><button class="btn btn-g btn-s" onclick="go('pool')" id="hPoolB">DEPOSIT</button></div>
  <div class="ac"><h3>Liquidation</h3><p>Earn NPH by initiating liquidations of risky troves</p><button class="btn btn-g btn-s" onclick="go('liq')">LIQUIDATE TROVE</button></div>
  <div class="ac"><h3>Redemption</h3><p>Redeem NPH at face value</p><button class="btn btn-g btn-s" onclick="go('redeem')">REDEEM NPH</button></div>
 </div>
 <div class="cd" style="text-align:center">
  <div class="cd-t">Nephrite Documentation</div>
- <div class="dl"><a href="https://nephrite.io" target="_blank">Manifesto &#8599;</a><a href="https://nephrite.io/audit" target="_blank">Audit &#8599;</a></div>
+ <div class="dl"><a href="https://drive.proton.me/urls/SK5DXN4DNG#ALVvWMTkfayD" target="_blank">Manifesto &#8599;</a><a href="https://www.scribd.com/document/641181034/Beam-StableCoin-Security-Analysis-by-Pessimistic?secret_password=djjynkOuDy0wRZh6rErI" target="_blank">Audit &#8599;</a></div>
 </div>
 </div>
 
@@ -302,81 +302,92 @@ function renderHome(){
         var myIcr=beamPrice>0&&myTok>0?(myCol*beamPrice/myTok*100):0;
         $('hIcr').textContent=myIcr>0?myIcr.toFixed(1)+'%':'–';$('hIcr').className='sv '+crC(myIcr);
         $('hMyDebt').textContent=fmtB(myTok);
-        $('hTroveP').textContent='Manage your active trove';
-        $('hTroveB').textContent='MANAGE';
+        var liqR=S&&S.liq_reserve?fg(S.liq_reserve):LIQ_RES;
+        var netDebt=Math.max(0,myTok-liqR);
+        $('hTroveP').innerHTML='<div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:700;color:var(--txt)"><span style="display:flex;align-items:center;gap:4px">'+bSvg+' '+fmtB(myCol)+' BEAM</span><span style="color:var(--txt3)">|</span><span style="display:flex;align-items:center;gap:4px">'+nSvg+' '+fmtB(netDebt)+' NPH</span></div>';
+        $('hTroveB').textContent='ADJUST';
     } else {
         $('hIcr').textContent='–';$('hIcr').className='sv';
         $('hMyDebt').textContent='–';
         $('hTroveP').textContent="You haven't borrow any Nephrite yet? To get it you need to open a Trove.";
         $('hTroveB').textContent='OPEN';
     }
-    if(u&&u.stab&&fg(u.stab.tok)>0)$('hMyStab').textContent=fmtB(fg(u.stab.tok));
-    else $('hMyStab').textContent='–';
+    if(u&&u.stab&&fg(u.stab.tok)>0){
+        $('hMyStab').textContent=fmtB(fg(u.stab.tok));
+        var poolHtml='<div style="display:flex;align-items:center;justify-content:center;gap:4px;font-size:13px;font-weight:700;color:var(--txt)">'+nSvg+' '+fmtB(fg(u.stab.tok))+' NPH</div>';
+        if(fg(u.stab.col)>0) poolHtml+='<div style="font-size:11px;color:var(--txt2);text-align:center;margin-top:4px">Earned: '+fmtB(fg(u.stab.col))+' BEAM'+(fg(u.stab.gov)>0?' + '+fmtB(fg(u.stab.gov))+' BEAMX':'')+'</div>';
+        else if(fg(u.stab.gov)>0) poolHtml+='<div style="font-size:11px;color:var(--txt2);text-align:center;margin-top:4px">Earned: '+fmtB(fg(u.stab.gov))+' BEAMX</div>';
+        $('hPoolP').innerHTML=poolHtml;
+        $('hPoolB').textContent='ADJUST';
+    } else {
+        $('hMyStab').textContent='–';
+        $('hPoolP').textContent='Earn BEAMX and BEAM by securing the system';
+        $('hPoolB').textContent='DEPOSIT';
+    }
 }
 
 // ═══════════════ TROVE PAGE ═══════════════
+var troveMode=''; // '', 'withdraw', 'deposit', 'borrow', 'repay', 'advanced'
+var backArrow='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>';
+
 function renderTrove(){
     var el=$('troveB'),u=U,s=S;
     var has=u&&u.my_trove;
-    var curCol=has?fg(u.my_trove.amounts.col):0;
-    var curTok=has?fg(u.my_trove.amounts.tok):0;
+    if(has) renderAdjustTrove(el); else renderOpenTrove(el);
+}
+
+// ── OPEN TROVE (no existing trove) ──
+function renderOpenTrove(el){
+    var s=S;
     var liqRes=s&&s.liq_reserve?fg(s.liq_reserve):LIQ_RES;
     var minDebt=s&&s.min_debt?fg(s.min_debt):MIN_DEBT;
     var minNet=minDebt>liqRes?(minDebt-liqRes):minDebt;
     var price=s&&s.price?Number(s.price):0;
 
-    var h='<div class="hdr"><button class="hdr-back" onclick="go(\'home\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> back</button><span class="hdr-t">'+(has?'Adjust Trove':'Open Trove')+'</span><span class="hdr-sp"></span></div>';
-    h+='<div class="ic"><div class="ic-l" id="tColLabel">Collateral amount (min 0 BEAM)</div><div class="ic-r"><input type="number" class="ic-i" id="tCol" placeholder="0" step="any" min="0" value="'+(has?curCol.toFixed(2):'')+'"><div class="ic-d"></div><div class="ic-u">'+bSvg+' BEAM</div></div><div class="ic-sub" id="tColUsd"></div></div>';
-    h+='<div class="ic"><div class="ic-l">Issuing volume (min '+minNet+' NPH)</div><div class="ic-r"><input type="number" class="ic-i" id="tTok" placeholder="'+minNet+'" step="any" min="0" value="'+(has?Math.max(0,curTok-liqRes).toFixed(2):minNet)+'"><div class="ic-d"></div><div class="ic-u">'+nSvg+' NPH</div></div><div class="ic-sub" id="tTokUsd"></div></div>';
+    var h='<div class="hdr"><button class="hdr-back" onclick="go(\'home\')">'+backArrow+' back</button><span class="hdr-t">Open Trove</span><span class="hdr-sp"></span></div>';
+    h+='<div class="ic"><div class="ic-l" id="tColLabel">Collateral amount (min 0 BEAM)</div><div class="ic-r"><input type="number" class="ic-i" id="tCol" placeholder="0" step="any" min="0"><div class="ic-d"></div><div class="ic-u">'+bSvg+' BEAM</div></div><div class="ic-sub" id="tColUsd"></div></div>';
+    h+='<div class="ic"><div class="ic-l">Issuing volume (min '+minNet+' NPH)</div><div class="ic-r"><input type="number" class="ic-i" id="tTok" placeholder="'+minNet+'" step="any" min="0" value="'+minNet+'"><div class="ic-d"></div><div class="ic-u">'+nSvg+' NPH</div></div><div class="ic-sub" id="tTokUsd">'+minNet+'.00 USD</div></div>';
     h+='<div id="tPred"></div><div id="tWarn"></div>';
-    h+='<div class="br"><button class="btn btn-gr" onclick="go(\'home\')">CANCEL</button><button class="btn btn-g" id="btnTC" data-label="CONFIRM" onclick="doTC()">CONFIRM</button></div>';
-    if(has)h+='<div style="padding:0 12px;margin-top:6px"><button class="btn btn-r" onclick="doCloseTrove()">CLOSE TROVE</button></div>';
+    h+='<div class="br"><button class="btn btn-gr" onclick="openTroveCancel()">CANCEL</button><button class="btn btn-g" id="btnTC" data-label="CONFIRM" onclick="doTC()">CONFIRM</button></div>';
     el.innerHTML=h;
 
     var ci=$('tCol'),ti=$('tTok'),db;
-    function pred(){clearTimeout(db);db=setTimeout(doPred,400);}
-    function updateUsd(){
+    function pred(){clearTimeout(db);db=setTimeout(doOpenPred,400);}
+    function uUsd(){
         var cv=parseFloat(ci.value)||0,tv=parseFloat(ti.value)||0;
         $('tColUsd').textContent=price>0?(cv*price).toFixed(2)+' USD':'';
         $('tTokUsd').textContent=tv>0?tv.toFixed(2)+' USD':'';
     }
-    ci.addEventListener('input',function(){updateUsd();pred();});
-    ti.addEventListener('input',function(){updateUsd();pred();});
+    ci.addEventListener('input',function(){uUsd();pred();});
+    ti.addEventListener('input',function(){uUsd();pred();});
 
-    // Auto-fill: for new trove, predict collateral for 120% ICR with min debt
-    if(!has){
-        var initTok=tg(minNet+liqRes); // total debt in groths
-        inv('role=user,action=trove_modify,bPredictOnly=1,tok='+initTok+',col=0,opTok=0,opCol=0,tcr_mperc=120000,bAutoTok=0,cid='+CID,function(r){
-            if(r&&!r.error&&r.prediction){
-                var autoCol=fg(r.prediction.amounts.col);
-                ci.value=Math.ceil(autoCol);
-                $('tColLabel').textContent='Collateral amount (min '+Math.ceil(autoCol)+' BEAM)';
-                updateUsd();
-                doPred();
-            }
-        });
-    } else {
-        updateUsd();
-        setTimeout(doPred,100);
-    }
+    // Auto-fill collateral for 120% ICR
+    var initTok=tg(minNet+liqRes);
+    inv('role=user,action=trove_modify,bPredictOnly=1,tok='+initTok+',col=0,opTok=0,opCol=0,tcr_mperc=120000,bAutoTok=0,cid='+CID,function(r){
+        if(r&&!r.error&&r.prediction){
+            var autoCol=fg(r.prediction.amounts.col);
+            ci.value=Math.ceil(autoCol);
+            $('tColLabel').textContent='Collateral amount (min '+Math.ceil(autoCol)+' BEAM)';
+            uUsd(); doOpenPred();
+        }
+    });
 }
 
-function doPred(){
+function doOpenPred(){
     var col=tg($('tCol').value||0);
     var netTok=parseFloat($('tTok').value||0);
     var liqRes=S&&S.liq_reserve?fg(S.liq_reserve):LIQ_RES;
-    var tok=tg(netTok+liqRes); // total debt = net debt + liquidation reserve
+    var tok=tg(netTok+liqRes);
     inv('role=user,action=trove_modify,bPredictOnly=1,tok='+tok+',col='+col+',opTok=0,opCol=0,tcr_mperc=0,bAutoTok=0,cid='+CID,function(r){
         var box=$('tPred'),warn=$('tWarn');
         if(!r||r.error){box.innerHTML='';warn.innerHTML='<div class="wb">'+eHuman(r)+'</div>';return;}
-        var p=r.prediction;var cr=parseFloat(p.cr);var fee=p.fee?fg(p.fee):0;var fpct=p.fee_perc?parseFloat(p.fee_perc):0;
-        var liqRes=S&&S.liq_reserve?fg(S.liq_reserve):LIQ_RES;
-        var totalDebt=fg(p.amounts.tok);
+        var p=r.prediction,cr=parseFloat(p.cr),fee=p.fee?fg(p.fee):0,fpct=p.fee_perc?parseFloat(p.fee_perc):0;
+        var lr=S&&S.liq_reserve?fg(S.liq_reserve):LIQ_RES,td=fg(p.amounts.tok);
         var iS='<svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>';
         box.innerHTML='<div class="ir"><span class="sl">ICR <span class="ii" data-tip="The Individual Collateral Ratio (ICR) is the ratio of the USD value of your Trove collateral to your Trove debt.">'+iS+'</span></span><span class="sv" style="'+(!isNaN(cr)?'color:'+(cr>=150?'#527B0B':cr>=110?'#b8860b':'#de3155'):'')+'">'+fmtP(cr)+'</span></div>'+
-            '<div class="ir"><span class="sl">Liquidation Reserve <span class="ii" data-tip="An amount set aside to cover the liquidator gas costs if your Trove needs to be liquidated. The amount increases your debt and is refunded if you close your Trove by fully paying off its net debt.">'+iS+'</span></span><span class="sv">'+liqRes+' NPH</span></div>'+
-            '<div class="ir"><span class="sl">Issuance fee <span class="ii" data-tip="The Issuance Fee is a one-off fee charged as a percentage of the borrowed amount (in BEAM). The fee varies between 0.5% and 5%.">'+iS+'</span></span><span class="sv">'+fee.toFixed(2)+' NPH ('+fpct.toFixed(1)+'%)</span></div>'+
-            '<div class="ir"><span class="sl">Total debt <span class="ii" data-tip="The total amount of NPH your Trove will hold, including your debt and the Liquidation Reserve.">'+iS+'</span></span><span class="sv">'+totalDebt.toFixed(2)+' NPH</span></div>';
+            '<div class="ir"><span class="sl">Liquidation Reserve <span class="ii" data-tip="An amount set aside to cover the liquidator gas costs if your Trove needs to be liquidated.">'+iS+'</span></span><span class="sv">'+lr+' NPH</span></div>'+
+            '<div class="ir"><span class="sl">Issuance fee <span class="ii" data-tip="The Issuance Fee is charged as a percentage of the borrowed amount, between 0.5% and 5%.">'+iS+'</span></span><span class="sv">'+fee.toFixed(2)+' NPH ('+fpct.toFixed(1)+'%)</span></div>'+
+            '<div class="ir"><span class="sl">Total debt <span class="ii" data-tip="The total amount of NPH your Trove will hold, including your debt and the Liquidation Reserve.">'+iS+'</span></span><span class="sv">'+td.toFixed(2)+' NPH</span></div>';
         var w='';
         if(!isNaN(cr)&&cr<110)w+='<div class="wb">ICR should be more than <b>110%</b>.</div>';
         if(!isNaN(cr)&&cr>=110&&cr<150)w+='<div class="hb">Keeping your ICR above <b>150%</b> can help avoid liquidation under Recovery Mode</div>';
@@ -384,47 +395,378 @@ function doPred(){
     });
 }
 
+function openTroveCancel(){var ci=$('tCol'),ti=$('tTok');if(ci)ci.value='';if(ti)ti.value='';var u=$('tColUsd');if(u)u.textContent='';var u2=$('tTokUsd');if(u2)u2.textContent='';var p=$('tPred');if(p)p.innerHTML='';var w=$('tWarn');if(w)w.innerHTML='';}
 function doTC(){
     var col=tg($('tCol').value||0);
     var netTok=parseFloat($('tTok').value||0);
     var liqRes=S&&S.liq_reserve?fg(S.liq_reserve):LIQ_RES;
     var tok=tg(netTok+liqRes);
-    tx('role=user,action=trove_modify,bPredictOnly=0,tok='+tok+',col='+col+',opTok=0,opCol=0,tcr_mperc=0,bAutoTok=0,cid='+CID,'btnTC','Trove updated');
+    tx('role=user,action=trove_modify,bPredictOnly=0,tok='+tok+',col='+col+',opTok=0,opCol=0,tcr_mperc=0,bAutoTok=0,cid='+CID,'btnTC','Trove opened');
 }
+
+// ── ADJUST TROVE (existing trove) ──
+function renderAdjustTrove(el){
+    var u=U,s=S;
+    var curCol=fg(u.my_trove.amounts.col);
+    var curTok=fg(u.my_trove.amounts.tok);
+    var liqRes=s&&s.liq_reserve?fg(s.liq_reserve):LIQ_RES;
+    var netDebt=Math.max(0,curTok-liqRes);
+    var price=s&&s.price?Number(s.price):0;
+    var colUsd=price>0?(curCol*price).toFixed(2)+' USD':'';
+
+    troveMode='';
+    var h='<div class="hdr"><button class="hdr-back" onclick="go(\'home\')">'+backArrow+' back</button><span class="hdr-t">Adjust Trove</span><span class="hdr-sp"></span></div>';
+
+    // Collateral section
+    h+='<div class="cd"><div class="ic-l">Collateral amount</div>';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;margin:8px 0">';
+    h+='<div style="display:flex;align-items:center;gap:6px">'+bSvg+' <span style="font-size:22px;font-weight:700;color:var(--gm)">'+fmtBF(curCol)+'</span> <span style="font-size:16px;font-weight:700">BEAM</span></div>';
+    h+='<div style="display:flex;gap:6px"><button class="btn btn-g btn-s" style="border:1px solid var(--gm);background:transparent;color:var(--gd)" onclick="troveAction(\'withdraw\')">WITHDRAW</button><button class="btn btn-g btn-s" style="border:1px solid var(--gm);background:transparent;color:var(--gd)" onclick="troveAction(\'deposit\')">DEPOSIT</button></div>';
+    h+='</div>';
+    h+='<div class="ic-sub">'+colUsd+'</div>';
+    h+='</div>';
+
+    // Debt section
+    h+='<div class="cd"><div class="ic-l">Debt</div>';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;margin:8px 0">';
+    h+='<div style="display:flex;align-items:center;gap:6px">'+nSvg+' <span style="font-size:22px;font-weight:700;color:var(--gm)">'+netDebt.toFixed(2)+'</span> <span style="font-size:16px;font-weight:700">NPH</span></div>';
+    h+='<div style="display:flex;gap:6px"><button class="btn btn-g btn-s" style="border:1px solid var(--gm);background:transparent;color:var(--gd)" onclick="troveAction(\'borrow\')">BORROW</button><button class="btn btn-g btn-s" style="border:1px solid var(--gm);background:transparent;color:var(--gd)" onclick="troveAction(\'repay\')">REPAY</button></div>';
+    h+='</div>';
+    h+='<div class="ic-sub">'+netDebt.toFixed(2)+' USD</div>';
+    h+='</div>';
+
+    // Claimable surplus (from liquidation/redemption)
+    var hasSurpT=u['surplus-t']&&(fg(u['surplus-t'].tok)>0||fg(u['surplus-t'].col)>0||fg(u['surplus-t'].gov)>0);
+    if(hasSurpT){
+        var st=u['surplus-t'];
+        h+='<div class="cd"><div class="cd-t" style="font-size:11px">Claimable Surplus</div>';
+        if(fg(st.col)>0)h+='<div class="sr"><span class="sl">BEAM</span><span class="sv">'+fmtB(fg(st.col))+' BEAM</span></div>';
+        if(fg(st.tok)>0)h+='<div class="sr"><span class="sl">NPH</span><span class="sv">'+fmtB(fg(st.tok))+' NPH</span></div>';
+        if(fg(st.gov)>0)h+='<div class="sr"><span class="sl">BEAMX</span><span class="sv">'+fmtB(fg(st.gov))+' BEAMX</span></div>';
+        h+='<button class="btn btn-g" style="margin-top:8px" id="btnCST" data-label="CLAIM SURPLUS" onclick="doCSTrove()">CLAIM SURPLUS</button></div>';
+    }
+
+    // Action input area (shown when user clicks a button)
+    h+='<div id="adjAction"></div>';
+
+    // Hints
+    h+='<div class="hb">To close your trove you need to repay <b>'+netDebt.toFixed(0)+' NPH</b></div>';
+    h+='<div class="hb">Keeping your CR above <b>150%</b> can help avoid liquidation under Recovery Mode</div>';
+
+    // Advanced
+    h+='<div class="cd" style="text-align:center"><button class="btn btn-g btn-s" style="border:1px solid var(--gm);background:transparent;color:var(--gd)" onclick="troveAction(\'advanced\')">ADVANCED</button>';
+    h+='<div class="nb" style="margin:10px 0 0;padding:8px"><b>Note.</b> Advanced adjustment mode allows you to change the amount of your collateral and debt simultaneously (in one transaction). This option is useful, for example, when your trove was partially redeemed, and you can\'t adjust it using the regular adjustment mode</div>';
+    h+='</div>';
+
+    el.innerHTML=h;
+}
+
+function troveAction(mode){
+    troveMode=mode;
+    var el=$('troveB'),u=U,s=S;
+    var curCol=fg(u.my_trove.amounts.col);
+    var curTok=fg(u.my_trove.amounts.tok);
+    var liqRes=s&&s.liq_reserve?fg(s.liq_reserve):LIQ_RES;
+    var netDebt=Math.max(0,curTok-liqRes);
+    var price=s&&s.price?Number(s.price):0;
+    var titles={withdraw:'Withdraw from Trove',deposit:'Deposit to Trove',borrow:'Borrow NPH',repay:'Repay Debt',advanced:'Advanced'};
+
+    var h='<div class="hdr"><button class="hdr-back" onclick="renderTrove()">'+backArrow+' back</button><span class="hdr-t">'+titles[mode]+'</span><span class="hdr-sp"></span></div>';
+
+    if(mode==='withdraw'){
+        h+='<div class="ic"><div class="ic-l">Amount</div><div class="ic-r"><input type="number" class="ic-i" id="adjAmt" placeholder="0" step="any" min="0"><div class="ic-d"></div><div class="ic-u">'+bSvg+' BEAM</div></div><div class="ic-sub" id="adjUsd">0.00 USD</div></div>';
+        h+='<div id="adjPred"></div>';
+        h+='<div class="br"><button class="btn btn-gr" onclick="adjCancel()">CANCEL</button><button class="btn btn-g" id="btnAdj" data-label="CONFIRM" onclick="doAdj()">CONFIRM</button></div>';
+    } else if(mode==='deposit'){
+        h+='<div class="ic"><div class="ic-l">Amount</div><div class="ic-r"><input type="number" class="ic-i" id="adjAmt" placeholder="0" step="any" min="0"><div class="ic-d"></div><div class="ic-u">'+bSvg+' BEAM</div></div><div class="ic-sub" id="adjUsd">0.00 USD</div></div>';
+        h+='<div id="adjPred"></div>';
+        h+='<div class="br"><button class="btn btn-gr" onclick="adjCancel()">CANCEL</button><button class="btn btn-g" id="btnAdj" data-label="CONFIRM" onclick="doAdj()">CONFIRM</button></div>';
+    } else if(mode==='borrow'){
+        h+='<div class="ic"><div class="ic-l">Amount</div><div class="ic-r"><input type="number" class="ic-i" id="adjAmt" placeholder="0" step="any" min="0"><div class="ic-d"></div><div class="ic-u">'+nSvg+' NPH</div></div><div class="ic-sub" id="adjUsd">0.00 USD</div></div>';
+        h+='<div id="adjFeeRow"></div>';
+        h+='<div id="adjPred"></div>';
+        h+='<div class="br"><button class="btn btn-gr" onclick="adjCancel()">CANCEL</button><button class="btn btn-g" id="btnAdj" data-label="CONFIRM" onclick="doAdj()">CONFIRM</button></div>';
+    } else if(mode==='repay'){
+        h+='<div class="ic"><div class="ic-l">Amount</div><div class="ic-r"><input type="number" class="ic-i" id="adjAmt" placeholder="0" step="any" min="0"><button onclick="fillAllDebt()" style="background:var(--gg);color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">all debt</button><div class="ic-d"></div><div class="ic-u">'+nSvg+' NPH</div></div><div class="ic-sub" id="adjUsd">0.00 USD</div></div>';
+        h+='<div id="adjPred"></div>';
+        h+='<div class="hb">To close the trove you need to repay <b>'+netDebt.toFixed(0)+' NPH</b></div>';
+        h+='<div class="br"><button class="btn btn-gr" onclick="adjCancel()">CANCEL</button><button class="btn btn-g" id="btnAdj" data-label="CONFIRM" onclick="doAdj()">CONFIRM</button></div>';
+    } else if(mode==='advanced'){
+        h+='<div class="ic"><div class="ic-l">Current amount ('+Math.round(curCol)+') BEAM</div><div class="ic-r"><input type="number" class="ic-i" id="adjCol" placeholder="'+Math.round(curCol)+'" step="any" min="0" value="'+Math.round(curCol)+'"><div class="ic-d"></div><div class="ic-u">'+bSvg+' BEAM</div></div><div class="ic-sub" id="adjColUsd">'+(price>0?(curCol*price).toFixed(2)+' USD':'')+'</div></div>';
+        h+='<div class="ic"><div class="ic-l">Issuing volume ( Current amount: '+curTok.toFixed(0)+' NPH)</div><div class="ic-r"><input type="number" class="ic-i" id="adjTok" placeholder="'+curTok.toFixed(0)+'" step="any" min="0" value="'+curTok.toFixed(0)+'"><div class="ic-d"></div><div class="ic-u">'+nSvg+' NPH</div></div><div class="ic-sub" id="adjTokUsd">'+curTok.toFixed(2)+' USD</div></div>';
+        h+='<div id="adjPred"></div><div id="adjWarn"></div>';
+        h+='<div class="br"><button class="btn btn-gr" onclick="adjCancel()">CANCEL</button><button class="btn btn-g" id="btnAdj" data-label="CONFIRM" onclick="doAdj()">CONFIRM</button></div>';
+    }
+
+    el.innerHTML=h;
+    document.querySelector('.pages').scrollTop=0;
+
+    // USD update + auto-predict
+    var inp=$('adjAmt')||$('adjCol');
+    var inp2=$('adjTok');
+    var db;
+    function uUsd(){
+        var v=parseFloat((inp||{}).value)||0;
+        var usdEl=$('adjUsd');
+        if(usdEl){
+            if(mode==='withdraw'||mode==='deposit') usdEl.textContent=price>0?(v*price).toFixed(2)+' USD':'0.00 USD';
+            else if(mode==='borrow'||mode==='repay') usdEl.textContent=v.toFixed(2)+' USD';
+        }
+        if(mode==='advanced'){
+            var cv=parseFloat($('adjCol').value)||0,tv=parseFloat($('adjTok').value)||0;
+            var cu=$('adjColUsd'),tu=$('adjTokUsd');
+            if(cu)cu.textContent=price>0?(cv*price).toFixed(2)+' USD':'';
+            if(tu)tu.textContent=tv.toFixed(2)+' USD';
+        }
+    }
+    function pred(){clearTimeout(db);db=setTimeout(doAdjPred,400);}
+    if(inp){inp.addEventListener('input',function(){uUsd();pred();});}
+    if(inp2){inp2.addEventListener('input',function(){uUsd();pred();});}
+
+    // Run initial predict
+    if(mode==='advanced') setTimeout(doAdjPred,100);
+}
+
+function doAdjPred(){
+    var u=U,s=S;
+    var curCol=fg(u.my_trove.amounts.col);
+    var curTok=fg(u.my_trove.amounts.tok);
+    var liqRes=s&&s.liq_reserve?fg(s.liq_reserve):LIQ_RES;
+    var amt,newCol,newTok;
+
+    if(troveMode==='withdraw'){
+        amt=parseFloat($('adjAmt').value)||0;
+        newCol=Math.max(0,curCol-amt); newTok=curTok;
+    } else if(troveMode==='deposit'){
+        amt=parseFloat($('adjAmt').value)||0;
+        newCol=curCol+amt; newTok=curTok;
+    } else if(troveMode==='borrow'){
+        amt=parseFloat($('adjAmt').value)||0;
+        newCol=curCol; newTok=curTok+amt;
+    } else if(troveMode==='repay'){
+        amt=parseFloat($('adjAmt').value)||0;
+        newCol=curCol; newTok=Math.max(0,curTok-amt);
+        if(newTok<=liqRes){newTok=0;newCol=0;}
+    } else if(troveMode==='advanced'){
+        newCol=parseFloat($('adjCol').value)||0;
+        newTok=parseFloat($('adjTok').value)||0; // advanced uses total debt directly
+    } else return;
+
+    // If closing trove (tok=0, col=0), skip prediction — shader won't return prediction for close
+    if(newTok===0&&newCol===0){
+        var box=$('adjPred');if(box)box.innerHTML='<div class="hb">This will <b>close your trove</b> and return all collateral.</div>';
+        return;
+    }
+
+    inv('role=user,action=trove_modify,bPredictOnly=1,tok='+tg(newTok)+',col='+tg(newCol)+',opTok=0,opCol=0,tcr_mperc=0,bAutoTok=0,cid='+CID,function(r){
+        var box=$('adjPred');if(!box)return;
+        if(!r||r.error){box.innerHTML='<div class="wb">'+eHuman(r)+'</div>';return;}
+        var p=r.prediction,cr=parseFloat(p.cr);
+        var fee=p.fee?fg(p.fee):0,fpct=p.fee_perc?parseFloat(p.fee_perc):0;
+        var labels={withdraw:'withdrawal',deposit:'depositing',borrow:'borrowing',repay:'repayment',advanced:''};
+
+        if(troveMode==='advanced'){
+            // Advanced: show full info like Open Trove
+            var iS='<svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>';
+            var td=fg(p.amounts.tok);
+            box.innerHTML='<div class="ir"><span class="sl">ICR <span class="ii" data-tip="The Individual Collateral Ratio.">'+iS+'</span></span><span class="sv" style="'+(cr>=150?'color:#527B0B':cr>=110?'color:#b8860b':'color:#de3155')+'">'+fmtP(cr)+'</span></div>'+
+                '<div class="ir"><span class="sl">Liquidation Reserve</span><span class="sv">'+liqRes+' NPH</span></div>'+
+                '<div class="ir"><span class="sl">Issuance fee <span class="ii" data-tip="Fee charged on borrowed amount.">'+iS+'</span></span><span class="sv">'+fee.toFixed(2)+' NPH ('+fpct.toFixed(1)+'%)</span></div>'+
+                '<div class="ir"><span class="sl">Total debt</span><span class="sv">'+td.toFixed(2)+' NPH</span></div>';
+            var warn=$('adjWarn');
+            if(warn){
+                var w='';
+                if(!isNaN(cr)&&cr<110)w+='<div class="wb">ICR should be more than <b>110%</b>.</div>';
+                if(!isNaN(cr)&&cr>=110&&cr<150)w+='<div class="hb">Keeping your ICR above <b>150%</b> can help avoid liquidation under Recovery Mode</div>';
+                warn.innerHTML=w;
+            }
+        } else if(troveMode==='borrow'){
+            // Borrow: show issuance fee + ICR estimate
+            var feeRow=$('adjFeeRow');
+            if(feeRow) feeRow.innerHTML='<div class="ir"><span class="sl">Issuance fee <span class="ii" data-tip="Fee charged on new borrowed amount."><svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span></span><span class="sv">'+fee.toFixed(2)+' NPH ('+fpct.toFixed(1)+'%)</span></div>';
+            box.innerHTML='<div class="hb">Estimated ICR after the '+labels[troveMode]+' is <b>'+fmtP(cr)+'</b></div>';
+        } else {
+            // Withdraw/Deposit/Repay: just show estimated ICR
+            box.innerHTML='<div class="hb">Estimated ICR after the '+labels[troveMode]+' is <b>'+fmtP(cr)+'</b></div>';
+        }
+    });
+}
+
+function adjCancel(){
+    // Clear input values and prediction, stay on same screen
+    var inp=$('adjAmt');if(inp){inp.value='';inp.dispatchEvent(new Event('input'));}
+    var col=$('adjCol');if(col){col.value='';col.dispatchEvent(new Event('input'));}
+    var tok=$('adjTok');if(tok){tok.value='';tok.dispatchEvent(new Event('input'));}
+    var pred=$('adjPred');if(pred)pred.innerHTML='';
+    var warn=$('adjWarn');if(warn)warn.innerHTML='';
+    var fee=$('adjFeeRow');if(fee)fee.innerHTML='';
+    var usd=$('adjUsd');if(usd)usd.textContent='0.00 USD';
+    var cu=$('adjColUsd');if(cu)cu.textContent='';
+    var tu=$('adjTokUsd');if(tu)tu.textContent='';
+}
+
+function fillAllDebt(){
+    var u=U,s=S;
+    if(!u||!u.my_trove)return;
+    var liqRes=s&&s.liq_reserve?fg(s.liq_reserve):LIQ_RES;
+    var netDebt=Math.max(0,fg(u.my_trove.amounts.tok)-liqRes);
+    var inp=$('adjAmt');
+    if(inp){inp.value=netDebt.toFixed(2);inp.dispatchEvent(new Event('input'));}
+}
+
+function doAdj(){
+    var u=U,s=S;
+    var curCol=fg(u.my_trove.amounts.col);
+    var curTok=fg(u.my_trove.amounts.tok);
+    var liqRes=s&&s.liq_reserve?fg(s.liq_reserve):LIQ_RES;
+    var newCol,newTok,amt;
+
+    if(troveMode==='withdraw'){
+        amt=parseFloat($('adjAmt').value)||0; newCol=Math.max(0,curCol-amt); newTok=curTok;
+    } else if(troveMode==='deposit'){
+        amt=parseFloat($('adjAmt').value)||0; newCol=curCol+amt; newTok=curTok;
+    } else if(troveMode==='borrow'){
+        amt=parseFloat($('adjAmt').value)||0; newCol=curCol; newTok=curTok+amt;
+    } else if(troveMode==='repay'){
+        amt=parseFloat($('adjAmt').value)||0; newCol=curCol; newTok=Math.max(0,curTok-amt);
+        // If repaying all net debt, close the trove (tok=0, col=0)
+        if(newTok<=liqRes){newTok=0;newCol=0;}
+    } else if(troveMode==='advanced'){
+        newCol=parseFloat($('adjCol').value)||0;
+        newTok=parseFloat($('adjTok').value)||0; // advanced uses total debt directly
+    } else return;
+
+    tx('role=user,action=trove_modify,bPredictOnly=0,tok='+tg(newTok)+',col='+tg(newCol)+',opTok=0,opCol=0,tcr_mperc=0,bAutoTok=0,cid='+CID,'btnAdj','Trove adjusted');
+}
+
+function doCSTrove(){tx('role=user,action=withdraw_surplus,cid='+CID,'btnCST','Surplus withdrawn');}
 function doCloseTrove(){
     tx('role=user,action=trove_modify,bPredictOnly=0,tok=0,col=0,opTok=0,opCol=0,tcr_mperc=0,bAutoTok=0,cid='+CID,null,'Trove closed');
     toast('Closing trove...','in');
 }
 
 // ═══════════════ POOL PAGE ═══════════════
+var poolMode='';
+
 function renderPool(){
-    var el=$('poolB'),u=U;
+    var el=$('poolB'),u=U,s=S;
     var curStab=u&&u.stab?fg(u.stab.tok):0;
-    var h='<div class="hdr"><button class="hdr-back" onclick="go(\'home\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> back</button><span class="hdr-t">Deposit to Stability Pool</span><span class="hdr-sp"></span></div>';
-    h+='<div class="ic"><div class="ic-l">Amount</div><div class="ic-r"><input type="number" class="ic-i" id="pAmt" placeholder="0" step="any" min="0" value="'+(curStab>0?curStab.toFixed(2):'')+'"><div class="ic-d"></div><div class="ic-u">'+nSvg+' NPH</div></div></div>';
+    var hasDeposit=curStab>0;
+    var totalStab=s&&s.stab_pool?fg(s.stab_pool.tok):0;
+    var poolShare=totalStab>0?(curStab/totalStab*100):0;
 
-    if(u&&u.stab&&(fg(u.stab.col)>0||fg(u.stab.gov)>0)){
-        h+='<div class="cd">';
-        if(fg(u.stab.col)>0)h+='<div class="sr"><span class="sl">Earned BEAM</span><span class="sv">'+fmtB(fg(u.stab.col))+' BEAM</span></div>';
-        if(fg(u.stab.gov)>0)h+='<div class="sr"><span class="sl">Earned BEAMX</span><span class="sv">'+fmtB(fg(u.stab.gov))+' BEAMX</span></div>';
+    poolMode='';
+    if(hasDeposit){
+        // ADJUST STABILITY POOL
+        var h='<div class="hdr"><button class="hdr-back" onclick="go(\'home\')">'+backArrow+' back</button><span class="hdr-t">Adjust Stability Pool</span><span class="hdr-sp"></span></div>';
+        h+='<div class="cd"><div class="ic-l">Deposited amount</div>';
+        h+='<div style="display:flex;align-items:center;justify-content:space-between;margin:8px 0">';
+        h+='<div><div style="display:flex;align-items:center;gap:6px">'+nSvg+' <span style="font-size:22px;font-weight:700;color:var(--gm)">'+curStab.toFixed(2)+'</span> <span style="font-size:16px;font-weight:700">NPH</span></div><div class="ic-sub">'+curStab.toFixed(2)+' USD</div></div>';
+        h+='<div style="display:flex;gap:6px"><button class="btn btn-g btn-s" style="border:1px solid var(--gm);background:transparent;color:var(--gd)" onclick="poolAction(\'withdraw\')">WITHDRAW</button><button class="btn btn-g btn-s" style="border:1px solid var(--gm);background:transparent;color:var(--gd)" onclick="poolAction(\'deposit\')">DEPOSIT</button></div>';
         h+='</div>';
-    }
+        h+='<div style="margin-top:8px;font-size:13px"><span style="color:var(--txt2)">Your pool share</span> <b>'+poolShare.toFixed(2)+' %</b></div>';
+        h+='<div class="hb" style="margin:10px 0 0">Each time you adjust your deposit you withdraw all rewards and liquidation revenue collected at the moment.</div>';
+        h+='</div>';
 
-    var hasSurp=u&&((u['surplus-t']&&(fg(u['surplus-t'].tok)>0||fg(u['surplus-t'].col)>0||fg(u['surplus-t'].gov)>0))||(u.surplus_s&&(fg(u.surplus_s.tok)>0||fg(u.surplus_s.col)>0||fg(u.surplus_s.gov)>0)));
-    if(hasSurp){
-        h+='<div class="cd"><div class="cd-t" style="font-size:11px">Claimable Surplus</div>';
-        var st=u['surplus-t']||{},ss=u.surplus_s||{};
-        if(fg(st.col||0)+fg(ss.col||0)>0)h+='<div class="sr"><span class="sl">BEAM</span><span class="sv">'+fmtB(fg(st.col||0)+fg(ss.col||0))+'</span></div>';
-        if(fg(st.tok||0)+fg(ss.tok||0)>0)h+='<div class="sr"><span class="sl">NPH</span><span class="sv">'+fmtB(fg(st.tok||0)+fg(ss.tok||0))+'</span></div>';
-        if(fg(st.gov||0)+fg(ss.gov||0)>0)h+='<div class="sr"><span class="sl">BEAMX</span><span class="sv">'+fmtB(fg(st.gov||0)+fg(ss.gov||0))+'</span></div>';
-        h+='<button class="btn btn-g" style="margin-top:8px" id="btnCS" data-label="CLAIM" onclick="doCS()">CLAIM</button></div>';
-    }
+        // Earned rewards
+        if(u.stab&&(fg(u.stab.col)>0||fg(u.stab.gov)>0)){
+            h+='<div class="cd">';
+            if(fg(u.stab.col)>0)h+='<div class="sr"><span class="sl">Earned BEAM</span><span class="sv">'+fmtB(fg(u.stab.col))+' BEAM</span></div>';
+            if(fg(u.stab.gov)>0)h+='<div class="sr"><span class="sl">Earned BEAMX</span><span class="sv">'+fmtB(fg(u.stab.gov))+' BEAMX</span></div>';
+            h+='</div>';
+        }
 
-    h+='<div class="br"><button class="btn btn-gr" onclick="go(\'home\')">CANCEL</button><button class="btn btn-g" id="btnPC" data-label="CONFIRM" onclick="doPC()">CONFIRM</button></div>';
-    h+='<div class="nb"><b>Please note</b> that the purpose of the Stability pool is to act as a collective liquidator of risky troves. Consequently, when there are risky troves in the system – withdrawals from the Stability pool are disabled until the liquidation of these troves. By depositing your NPH to the Stability pool, you provide the right to use these NPH for liquidations to the system.</div>';
-    el.innerHTML=h;
+        // Surplus
+        var hasSurp=u&&((u['surplus-t']&&(fg(u['surplus-t'].tok)>0||fg(u['surplus-t'].col)>0||fg(u['surplus-t'].gov)>0))||(u.surplus_s&&(fg(u.surplus_s.tok)>0||fg(u.surplus_s.col)>0||fg(u.surplus_s.gov)>0)));
+        if(hasSurp){
+            h+='<div class="cd"><div class="cd-t" style="font-size:11px">Claimable Surplus</div>';
+            var st=u['surplus-t']||{},ss=u.surplus_s||{};
+            if(fg(st.col||0)+fg(ss.col||0)>0)h+='<div class="sr"><span class="sl">BEAM</span><span class="sv">'+fmtB(fg(st.col||0)+fg(ss.col||0))+'</span></div>';
+            if(fg(st.tok||0)+fg(ss.tok||0)>0)h+='<div class="sr"><span class="sl">NPH</span><span class="sv">'+fmtB(fg(st.tok||0)+fg(ss.tok||0))+'</span></div>';
+            if(fg(st.gov||0)+fg(ss.gov||0)>0)h+='<div class="sr"><span class="sl">BEAMX</span><span class="sv">'+fmtB(fg(st.gov||0)+fg(ss.gov||0))+'</span></div>';
+            h+='<button class="btn btn-g" style="margin-top:8px" id="btnCS" data-label="CLAIM" onclick="doCS()">CLAIM</button></div>';
+        }
+
+        // Action input area
+        h+='<div id="poolAction"></div>';
+        el.innerHTML=h;
+    } else {
+        // DEPOSIT TO STABILITY POOL (no existing deposit)
+        var h='<div class="hdr"><button class="hdr-back" onclick="go(\'home\')">'+backArrow+' back</button><span class="hdr-t">Deposit to Stability Pool</span><span class="hdr-sp"></span></div>';
+        h+='<div class="ic"><div class="ic-l">Amount</div><div class="ic-r"><input type="number" class="ic-i" id="pAmt" placeholder="0" step="any" min="0"><div class="ic-d"></div><div class="ic-u">'+nSvg+' NPH</div></div><div class="ic-sub" id="pUsd">0.00 USD</div></div>';
+        h+='<div class="br"><button class="btn btn-gr" onclick="poolCancel()">CANCEL</button><button class="btn btn-g" id="btnPC" data-label="CONFIRM" onclick="doPC()">CONFIRM</button></div>';
+        h+='<div class="nb"><b>Please note</b> that the purpose of the Stability pool is to act as a collective liquidator of risky troves. Consequently, when there are risky troves in the system – withdrawals from the Stability pool are disabled until the liquidation of these troves. By depositing your NPH to the Stability pool, you provide the right to use these NPH for liquidations to the system.</div>';
+        el.innerHTML=h;
+        var pi=$('pAmt');
+        if(pi)pi.addEventListener('input',function(){var v=parseFloat(pi.value)||0;$('pUsd').textContent=v.toFixed(2)+' USD';});
+    }
 }
 
+function poolAction(mode){
+    poolMode=mode;
+    var u=U,s=S;
+    var curStab=u&&u.stab?fg(u.stab.tok):0;
+    var totalStab=s&&s.stab_pool?fg(s.stab_pool.tok):0;
+    var poolShare=totalStab>0?(curStab/totalStab*100):0;
+    var titles={withdraw:'Withdraw from Stability Pool',deposit:'Deposit to Stability Pool'};
+
+    var h='<div class="hdr"><button class="hdr-back" onclick="renderPool()">'+backArrow+' back</button><span class="hdr-t">'+titles[mode]+'</span><span class="hdr-sp"></span></div>';
+
+    // Amount input
+    h+='<div class="ic"><div class="ic-l">Amount</div><div class="ic-r"><input type="number" class="ic-i" id="pAmt" placeholder="0" step="any" min="0">';
+    if(mode==='withdraw') h+='<button onclick="poolFillMax()" style="background:var(--gg);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">max</button>';
+    h+='<div class="ic-d"></div><div class="ic-u">'+nSvg+' NPH</div></div><div class="ic-sub" id="pUsd">0.00 USD</div></div>';
+
+    // Estimated pool share hint
+    h+='<div id="poolEstimate"></div>';
+
+    // Cancel / Confirm
+    h+='<div class="br"><button class="btn btn-gr" onclick="poolActionCancel()">CANCEL</button><button class="btn btn-g" id="btnPC" data-label="CONFIRM" onclick="doPoolAction()">CONFIRM</button></div>';
+
+    // Current collateral + pool share
+    h+='<div class="cd"><div class="ic-l">Collateral amount</div>';
+    h+='<div style="display:flex;align-items:center;gap:6px;margin:6px 0">'+nSvg+' <span style="font-size:18px;font-weight:700">'+curStab.toFixed(2)+' NPH</span></div>';
+    h+='<div class="ic-sub">'+curStab.toFixed(2)+' USD</div>';
+    h+='<div style="margin-top:10px;font-size:13px"><span style="color:var(--txt2)">Your pool share</span> <b>'+poolShare.toFixed(2)+' %</b></div>';
+    h+='</div>';
+
+    // Disclaimer
+    h+='<div class="nb"><b>Please note</b> that the purpose of the Stability pool is to act as a collective liquidator of risky troves. Consequently, when there are risky troves in the system – withdrawals from the Stability pool are disabled until the liquidation of these troves. By depositing your NPH to the Stability pool, you provide the right to use these NPH for liquidations to the system.</div>';
+
+    $('poolB').innerHTML=h;
+    document.querySelector('.pages').scrollTop=0;
+    var pi=$('pAmt');
+    if(pi)pi.addEventListener('input',function(){
+        var v=parseFloat(pi.value)||0;
+        $('pUsd').textContent=v.toFixed(2)+' USD';
+        // Estimate pool share
+        var newStab=mode==='withdraw'?Math.max(0,curStab-v):curStab+v;
+        var newTotal=mode==='withdraw'?Math.max(0,totalStab-v):totalStab+v;
+        var est=newTotal>0?(newStab/newTotal*100):0;
+        var label=mode==='withdraw'?'withdrawal':'deposit';
+        $('poolEstimate').innerHTML='<div class="hb">Your estimated pool share after the '+label+' is <b>'+est.toFixed(2)+' %</b></div>';
+    });
+}
+
+function poolFillMax(){
+    var u=U;var curStab=u&&u.stab?fg(u.stab.tok):0;
+    var inp=$('pAmt');if(inp){inp.value=curStab.toFixed(2);inp.dispatchEvent(new Event('input'));}
+}
+
+function poolActionCancel(){var inp=$('pAmt');if(inp){inp.value='';var u=$('pUsd');if(u)u.textContent='0.00 USD';}}
+
+function doPoolAction(){
+    var u=U;
+    var curStab=u&&u.stab?fg(u.stab.tok):0;
+    var amt=parseFloat($('pAmt').value)||0;
+    var newVal;
+    if(poolMode==='withdraw'){newVal=Math.max(0,curStab-amt);}
+    else if(poolMode==='deposit'){newVal=curStab+amt;}
+    else return;
+    tx('role=user,action=upd_stab,newVal='+tg(newVal)+',cid='+CID,'btnPC','Stability pool updated');
+}
+
+function poolCancel(){var inp=$('pAmt');if(inp){inp.value='';var usd=$('pUsd');if(usd)usd.textContent='0.00 USD';}}
 function doPC(){var v=tg($('pAmt').value||0);tx('role=user,action=upd_stab,newVal='+v+',cid='+CID,'btnPC','Stability pool updated');}
 function doCS(){tx('role=user,action=withdraw_surplus,cid='+CID,'btnCS','Surplus withdrawn');}
 
@@ -432,16 +774,23 @@ function doCS(){tx('role=user,action=withdraw_surplus,cid='+CID,'btnCS','Surplus
 function renderLiq(){
     var el=$('liqB');
     var troves=T&&T.troves?T.troves:[];
-    var price=S&&S.price?Number(S.price):0;
-    var h='<div class="hdr"><button class="hdr-back" onclick="go(\'home\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> back</button><span class="hdr-t">Liquidation</span><span class="hdr-sp"></span></div>';
+    var iS='<svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>';
+
+    var h='<div class="hdr"><button class="hdr-back" onclick="go(\'home\')">'+backArrow+' back</button><span class="hdr-t">Liquidation</span><span class="hdr-sp"></span></div>';
     h+='<div class="cd">';
-    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:800;color:#204501;letter-spacing:1px;text-transform:uppercase;font-size:12px">Risky Troves</div><button class="btn btn-g btn-s" id="btnLQ" data-label="INITIATE LIQUIDATION" onclick="doLQ()">INITIATE LIQUIDATION</button></div>';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:800;color:#204501;letter-spacing:1px;text-transform:uppercase;font-size:12px">Risky Troves</div><div style="display:flex;align-items:center;gap:6px"><span class="ii" style="opacity:0.5;min-width:20px;min-height:20px;width:20px;height:20px" data-tip="<b>Important note!</b>\nBy pressing the &quot;Initiate liquidation&quot; button, you send a transaction to Nephrite\'s smart contract, which initiates the liquidation of risky troves.\n\n<b>You don\'t have to repay a debt of that troves - you only have to pay a gas fee</b> for the transaction, and the system will liquidate these troves by itself.\n\nYou will get 10 NPH for each liquidated trove as a reward, and you can liquidate a maximum of 10 troves at once.">'+iS+'</span><button class="btn btn-g btn-s" id="btnLQ" data-label="INITIATE LIQUIDATION" onclick="doLQ()">INITIATE LIQUIDATION</button></div></div>';
     if(troves.length>0){
-        h+='<div style="overflow-x:auto"><table class="tb"><thead><tr><th>#</th><th>Collateral<br><span style="font-weight:400">(BEAM)</span></th><th>Debt<br><span style="font-weight:400">(NPH)</span></th><th>Collateral Ratio</th></tr></thead><tbody>';
+        h+='<div style="overflow-x:auto"><table class="tb"><thead><tr><th>#</th><th>Collateral<br><span style="font-weight:400">(BEAM)</span></th><th>Debt<br><span style="font-weight:400">(NPH)</span></th><th style="text-align:center">Collateral Ratio</th><th></th></tr></thead><tbody>';
         for(var i=0;i<troves.length;i++){
             var t=troves[i],cr=parseFloat(t.cr);
             var isMe=U&&U.my_trove&&Number(t.amounts.tok)===Number(U.my_trove.amounts.tok)&&Number(t.amounts.col)===Number(U.my_trove.amounts.col);
-            h+='<tr'+(isMe?' class="me"':'')+'><td>'+(i+1)+'</td><td>'+fmtBF(fg(t.amounts.col))+'</td><td>'+fmtBF(fg(t.amounts.tok))+'</td><td style="'+(cr>=150?'color:#527B0B':cr>=110?'color:#b8860b':'color:#de3155')+'">'+fmtP(cr)+'</td></tr>';
+            h+='<tr'+(isMe?' class="me"':'')+'>';
+            h+='<td>'+(i+1)+'</td>';
+            h+='<td>'+fmtBF(fg(t.amounts.col))+'</td>';
+            h+='<td>'+fmtBF(fg(t.amounts.tok))+'</td>';
+            h+='<td style="text-align:center;white-space:nowrap;'+(cr>=150?'color:#527B0B':cr>=110?'color:#b8860b':'color:#de3155')+'"><span>'+fmtP(cr)+'</span></td>';
+            h+='<td style="width:1px;padding:0 0 0 2px">'+(isMe?'<span style="background:rgba(82,123,11,.1);border:1px solid rgba(82,123,11,.3);border-radius:4px;padding:1px 4px;font-size:9px;font-style:italic;color:#527B0B;white-space:nowrap">my trove</span>':'')+'</td>';
+            h+='</tr>';
         }
         h+='</tbody></table></div>';
     } else h+='<div style="text-align:center;color:var(--txt2);padding:16px">No active troves</div>';
@@ -454,24 +803,31 @@ function doLQ(){tx('role=user,action=liquidate,bPredictOnly=0,nMaxTroves=10,cid=
 // ═══════════════ REDEMPTION PAGE ═══════════════
 function renderRedeem(){
     var el=$('redeemB');
-    var h='<div class="hdr"><button class="hdr-back" onclick="go(\'home\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> back</button><span class="hdr-t">Redemption</span><span class="hdr-sp"></span></div>';
-    h+='<div class="ic"><div class="ic-l">Amount</div><div class="ic-r"><input type="number" class="ic-i" id="rAmt" placeholder="0" step="any" min="0"><div class="ic-d"></div><div class="ic-u">'+nSvg+' NPH</div></div></div>';
+    var h='<div class="hdr"><button class="hdr-back" onclick="go(\'home\')">'+backArrow+' back</button><span class="hdr-t">Redemption</span><span class="hdr-sp"></span></div>';
+    h+='<div class="ic"><div class="ic-l">Amount</div><div class="ic-r"><input type="number" class="ic-i" id="rAmt" placeholder="0" step="any" min="0"><div class="ic-d"></div><div class="ic-u">'+nSvg+' NPH</div></div><div class="ic-sub" id="rUsd">0.00 USD</div></div>';
     h+='<div class="ir"><span class="sl">Redemption fee</span><span class="sv" id="rFee">0.00 BEAM (0%)</span></div>';
     h+='<div id="rPred"></div>';
-    h+='<div class="br"><button class="btn btn-gr" onclick="go(\'home\')">CANCEL</button><button class="btn btn-g" id="btnRC" data-label="CONFIRM" onclick="doRC()">CONFIRM</button></div>';
+    h+='<div class="br"><button class="btn btn-gr" onclick="redeemCancel()">CANCEL</button><button class="btn btn-g" id="btnRC" data-label="CONFIRM" onclick="doRC()">CONFIRM</button></div>';
     el.innerHTML=h;
     var ri=$('rAmt'),db;
-    if(ri)ri.addEventListener('input',function(){clearTimeout(db);db=setTimeout(doRP,400);});
+    if(ri)ri.addEventListener('input',function(){
+        var v=parseFloat(ri.value)||0;
+        $('rUsd').textContent=v.toFixed(2)+' USD';
+        clearTimeout(db);db=setTimeout(doRP,400);
+    });
 }
 
 function doRP(){
-    var v=tg($('rAmt').value||0);if(v<=0)return;
+    var v=tg($('rAmt').value||0);if(v<=0){$('rFee').textContent='0.00 BEAM (0%)';$('rPred').innerHTML='';return;}
     inv('role=user,action=redeem,bPredictOnly=1,val='+v+',cid='+CID,function(r){
-        var fe=$('rFee');
-        if(!r||r.error){fe.textContent=eHuman(r);return;}
-        var p=r.prediction;fe.textContent=fg(p.fee).toFixed(2)+' BEAM ('+parseFloat(p.fee_perc).toFixed(1)+'%)';
+        if(!r||r.error){$('rFee').textContent=eHuman(r);$('rPred').innerHTML='';return;}
+        var p=r.prediction;
+        var fee=fg(p.fee),fpct=parseFloat(p.fee_perc),colNet=fg(p.col_netto);
+        $('rFee').textContent=fee.toFixed(2)+' BEAM ('+fpct.toFixed(3)+'%)';
+        $('rPred').innerHTML='<div class="hb">You will receive <b>'+colNet.toFixed(8)+' BEAM</b></div>';
     });
 }
+function redeemCancel(){var inp=$('rAmt');if(inp){inp.value='';var usd=$('rUsd');if(usd)usd.textContent='0.00 USD';$('rFee').textContent='0.00 BEAM (0%)';$('rPred').innerHTML='';}}
 function doRC(){var v=tg($('rAmt').value||0);if(v<=0){toast('Enter an amount','in');return;}tx('role=user,action=redeem,bPredictOnly=0,val='+v+',cid='+CID,'btnRC','Redemption executed');}
 
 // ═══════════════ NAVIGATION ═══════════════
@@ -490,9 +846,15 @@ function toast(m,t){var c=$('tc'),e=document.createElement('div');e.className='t
 var activeTip=null;
 function tipShow(el,msg){
     tipHide();
-    var tp=document.createElement('div');tp.className='tp on';tp.textContent=msg;
-    el.parentElement.appendChild(tp);activeTip=tp;
-    requestAnimationFrame(function(){if(tp.getBoundingClientRect().right>window.innerWidth-8){tp.style.left='auto';tp.style.right='0';}});
+    var parent=el.parentElement;
+    parent.style.position='relative';
+    var tp=document.createElement('div');tp.className='tp on';tp.innerHTML=msg.replace(/\n/g,'<br>');
+    parent.appendChild(tp);activeTip=tp;
+    requestAnimationFrame(function(){
+        var r=tp.getBoundingClientRect();
+        if(r.right>window.innerWidth-8){tp.style.left='auto';tp.style.right='0';}
+        if(r.left<8){tp.style.left='0';tp.style.right='auto';}
+    });
 }
 function tipHide(){if(activeTip&&activeTip.parentNode){activeTip.parentNode.removeChild(activeTip);activeTip=null;}}
 function tipSetup(){
@@ -508,7 +870,7 @@ function tipSetup(){
 }
 
 // ═══════════════ EXPOSE + INIT ═══════════════
-window.go=go;window.doTC=doTC;window.doCloseTrove=doCloseTrove;window.doPC=doPC;window.doCS=doCS;window.doLQ=doLQ;window.doRC=doRC;
+window.go=go;window.openTroveCancel=openTroveCancel;window.doTC=doTC;window.doCSTrove=doCSTrove;window.doCloseTrove=doCloseTrove;window.troveAction=troveAction;window.renderTrove=renderTrove;window.adjCancel=adjCancel;window.fillAllDebt=fillAllDebt;window.doAdj=doAdj;window.doPC=doPC;window.poolCancel=poolCancel;window.renderPool=renderPool;window.poolAction=poolAction;window.poolActionCancel=poolActionCancel;window.poolFillMax=poolFillMax;window.doPoolAction=doPoolAction;window.doCS=doCS;window.doLQ=doLQ;window.doRC=doRC;window.redeemCancel=redeemCancel;
 document.addEventListener('DOMContentLoaded',function(){init();tipSetup();});
 })();
 </script>

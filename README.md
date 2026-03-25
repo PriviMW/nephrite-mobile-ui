@@ -94,4 +94,4 @@ Install `releases/NephriteMobile.dapp` in the Beam Desktop Wallet or PriviMW Wal
 
 ## License
 
-Apache 2.0
+MIT

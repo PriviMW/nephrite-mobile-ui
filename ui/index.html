@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Nephrite Mobile</title>
+<style>
+:root{--gd:#204501;--gm:#527B0B;--gb:#73A30A;--gg:linear-gradient(273.6deg,#527B0B 0.88%,#73A30A 94.96%);--bg:#e8eeda;--card:#F4F7EC;--card2:#eef3e2;--white:#fff;--txt:#333;--txt2:rgba(0,0,0,0.5);--txt3:rgba(0,0,0,0.3);--bdr:rgba(32,69,1,0.1);--red:#de3155;--yel:#f4ce4a}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;font-size:14px;color:var(--txt);background:var(--bg);-webkit-font-smoothing:antialiased}
+.app{max-width:440px;margin:0 auto;height:100vh;display:flex;flex-direction:column}
+.pages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.pg{display:none;padding:0 0 20px}.pg.on{display:block}
+/* Header */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);flex-shrink:0;position:sticky;top:0;z-index:10}
+.hdr-back,.hdr-sp{width:60px}.hdr-sp{pointer-events:none}
+.hdr-back{display:flex;align-items:center;gap:4px;color:var(--gm);font-size:14px;font-weight:700;cursor:pointer;background:none;border:none}
+.hdr-back svg{width:14px;height:14px}
+.hdr-t{font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--gd)}
+/* Cards */
+.cd{background:var(--card);border-radius:14px;margin:0 12px 10px;padding:18px 14px;box-shadow:0 1px 2px rgba(0,0,0,0.04)}
+.cd-t{font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--gd);text-align:center;margin-bottom:12px}
+/* NPH badge */
+.badge{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gg);border-radius:20px;padding:7px 18px;margin:0 auto 14px;color:#fff;font-size:15px;font-weight:700}
+.badge svg{width:22px;height:22px}
+/* Stat rows */
+.sr{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0}
+.sr+.sr{border-top:1px solid var(--bdr)}
+.sl{color:var(--txt2);font-size:13px;font-weight:600;display:flex;align-items:center;gap:4px}
+.sv{font-weight:700;color:var(--txt);text-align:right;font-variant-numeric:tabular-nums}
+.sv small{font-size:11px;color:var(--txt2);font-weight:400;display:block}
+.sv.grn{color:#527B0B}.sv.red{color:var(--red)}.sv.yel{color:#b8860b}
+/* Info icon */
+.ii{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;cursor:help;flex-shrink:0;position:relative;-webkit-user-select:none;user-select:none;opacity:0.3}
+.ii svg{width:16px;height:16px}
+.tp{display:none;position:absolute;left:0;top:calc(100% + 6px);min-width:220px;max-width:280px;background:var(--card);color:var(--txt);font-size:12px;font-weight:400;padding:10px 12px;border-radius:10px;z-index:200;line-height:1.5;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid var(--bdr);pointer-events:none;white-space:normal}
+.tp.on{display:block}
+.sl{position:relative}
+/* Grid 2x2 */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 12px 10px}
+.ac{background:var(--card);border-radius:14px;padding:18px 12px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,0.04);display:flex;flex-direction:column;justify-content:space-between;min-height:160px}
+.ac h3{font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--gd);margin-bottom:6px}
+.ac p{font-size:11px;color:var(--txt2);margin-bottom:12px;line-height:1.4;flex:1}
+.ac .btn{margin-top:auto}
+/* Buttons */
+.btn{display:block;width:100%;padding:12px 18px;border:none;border-radius:10px;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;text-align:center;transition:all .15s;color:#fff}
+.btn:active{transform:scale(.98)}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn-g{background:var(--gg)}.btn-g:active{box-shadow:0 0 8px rgba(82,123,11,.4)}
+.btn-gr{background:rgba(0,0,0,.12);color:rgba(0,0,0,.35)}
+.btn-r{background:rgba(222,49,85,.1);color:var(--red)}
+.btn-s{padding:9px 14px;font-size:11px;width:auto;display:inline-block}
+.br{display:flex;gap:8px;margin:12px 12px 0}.br .btn{flex:1}
+/* Input */
+.ic{background:var(--card);border-radius:14px;padding:10px 14px;margin:0 12px 10px}
+.ic-l{font-size:11px;color:var(--txt2);margin-bottom:4px}
+.ic-r{display:flex;align-items:center;gap:8px}
+.ic-i{flex:1;border:none;background:transparent;font-size:26px;font-weight:700;color:var(--txt);outline:none;width:100%;font-variant-numeric:tabular-nums}
+.ic-i::placeholder{color:var(--txt3)}
+.ic-d{height:32px;width:1px;background:var(--bdr);flex-shrink:0}
+.ic-u{font-size:14px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.ic-u svg{width:22px;height:22px}
+.ic-sub{font-size:11px;color:var(--txt2);padding:2px 0 0}
+/* Info rows */
+.ir{display:flex;justify-content:space-between;padding:7px 14px}.ir .sl{font-size:12px}.ir .sv{font-size:12px}
+/* Warning */
+.wb{background:rgba(222,49,85,.08);border-radius:8px;padding:8px 12px;margin:6px 12px;font-size:12px;font-weight:600;color:var(--red)}
+.hb{background:rgba(82,123,11,.06);border-radius:8px;padding:8px 12px;margin:6px 12px;font-size:12px;font-style:italic;color:var(--txt2)}
+/* Note */
+.nb{background:var(--card);border-radius:14px;padding:12px 14px;margin:0 12px 10px;font-size:11px;font-style:italic;color:var(--txt2);line-height:1.5}
+.nb b{font-style:italic;color:var(--gd)}
+/* Table */
+.tb{width:100%;border-collapse:collapse;font-size:12px}
+.tb th{color:var(--txt2);font-weight:700;text-align:left;padding:7px 5px;font-size:11px}
+.tb td{padding:9px 5px}.tb tr:nth-child(even){background:rgba(32,69,1,.04)}
+.tb .me{background:rgba(82,123,11,.12)!important}
+/* Toast */
+#tc{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:999;width:90%;max-width:400px;pointer-events:none}
+.tt{padding:10px 14px;border-radius:10px;margin-bottom:6px;font-size:13px;font-weight:600;pointer-events:auto;animation:si .2s ease}
+.tt.ok{background:#73A30A;color:#fff}.tt.er{background:var(--red);color:#fff}.tt.in{background:#0bccf7;color:#042548}
+@keyframes si{from{transform:translateY(-10px);opacity:0}to{transform:translateY(0);opacity:1}}
+/* Connect */
+.conn{text-align:center;padding:60px 20px;color:var(--txt2)}
+.conn .sp{display:inline-block;width:24px;height:24px;border:2px solid var(--bdr);border-top-color:var(--gm);border-radius:50%;animation:sn .8s linear infinite;margin-bottom:12px}
+@keyframes sn{to{transform:rotate(360deg)}}
+/* Doc links */
+.dl{display:flex;justify-content:center;gap:20px;margin-top:6px}
+.dl a{color:var(--gd);font-weight:700;font-size:13px;text-decoration:none}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="pages">
+
+<!-- Connect -->
+<div class="conn" id="conn"><div class="sp"></div><div id="connT">Connecting to Beam Wallet...</div></div>
+
+<!-- HOME -->
+<div class="pg" id="pg-home">
+<div class="cd" style="margin-top:12px">
+ <div class="cd-t">Nephrite Ecosystem</div>
+ <div class="badge"><img src="nph-coin.svg" style="width:24px;height:24px"> 1 NPH = 1 USD</div>
+ <div class="sr"><span class="sl">TVL <span class="ii" data-tip="Total value locked in the system, denominated in USD and BEAM"><svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span></span><span class="sv" id="hTvl">—</span></div>
+ <div class="sr"><span class="sl">Troves <span class="ii" data-tip="Total number of active Troves in the system"><svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span></span><span class="sv" id="hTroves">—</span></div>
+ <div class="sr"><span class="sl">NPH supply <span class="ii" data-tip="Total amount of NPH tokens currently in circulation"><svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span></span><span class="sv" id="hSupply">—</span></div>
+ <div class="sr"><span class="sl">NPH in Stability Pool <span class="ii" data-tip="Total amount of NPH deposited in the Stability Pool, with its share of total supply"><svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span></span><span class="sv" id="hStab">—</span></div>
+ <div class="sr"><span class="sl">TCR <span class="ii" data-tip="The ratio of the USD value of the entire system collateral at the current BEAM:USD price, to the entire system debt"><svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span></span><span class="sv" id="hTcr">—</span></div>
+ <div class="sr"><span class="sl">Issuance fee <span class="ii" data-tip="The Issuance Fee is a one-off fee charged as a percentage of the borrowed amount (in BEAM). The fee varies between 0.5% and 5% depending on NPH redemption volumes. Under the Recovery mode the fee is set to 0%."><svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span></span><span class="sv" id="hFee">—</span></div>
+ <div class="sr"><span class="sl">Recovery Mode <span class="ii" data-tip="Recovery Mode is activated when the Total Collateral Ratio (TCR) falls below 150%. When active, your Trove can be liquidated if its collateral ratio is below the TCR."><svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span></span><span class="sv" id="hRecov">—</span></div>
+ <div class="sr"><span class="sl">Recovery Mode Price Threshold <span class="ii" data-tip="The USD value of BEAM below which the Total Collateral Ratio will drop below 150% and the system will enter Recovery Mode."><svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span></span><span class="sv" id="hRecovP">—</span></div>
+</div>
+<div class="cd">
+ <div class="cd-t">My Position</div>
+ <div class="sr"><span class="sl">ICR <span class="ii" data-tip="The Individual Collateral Ratio (ICR) is the ratio of the USD value of your Trove collateral to your Trove debt."><svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span></span><span class="sv" id="hIcr">–</span></div>
+ <div class="sr"><span class="sl">Total NPH Debt <span class="ii" data-tip="The total amount of NPH you have borrowed, including the Liquidation Reserve."><svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span></span><span class="sv" id="hMyDebt">–</span></div>
+ <div class="sr"><span class="sl">NPH in Stability Pool <span class="ii" data-tip="The amount of NPH you have deposited in the Stability Pool."><svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span></span><span class="sv" id="hMyStab">–</span></div>
+</div>
+<div class="grid">
+ <div class="ac"><h3>Trove</h3><p id="hTroveP">You haven't borrow any Nephrite yet? To get it you need to open a Trove.</p><button class="btn btn-g btn-s" onclick="go('trove')" id="hTroveB">OPEN</button></div>
+ <div class="ac"><h3>Stability Pool</h3><p>Earn BEAMX and BEAM by securing the system</p><button class="btn btn-g btn-s" onclick="go('pool')">DEPOSIT</button></div>
+ <div class="ac"><h3>Liquidation</h3><p>Earn NPH by initiating liquidations of risky troves</p><button class="btn btn-g btn-s" onclick="go('liq')">LIQUIDATE TROVE</button></div>
+ <div class="ac"><h3>Redemption</h3><p>Redeem NPH at face value</p><button class="btn btn-g btn-s" onclick="go('redeem')">REDEEM NPH</button></div>
+</div>
+<div class="cd" style="text-align:center">
+ <div class="cd-t">Nephrite Documentation</div>
+ <div class="dl"><a href="https://nephrite.io" target="_blank">Manifesto &#8599;</a><a href="https://nephrite.io/audit" target="_blank">Audit &#8599;</a></div>
+</div>
+</div>
+
+<!-- TROVE -->
+<div class="pg" id="pg-trove"><div id="troveB"></div></div>
+
+<!-- POOL -->
+<div class="pg" id="pg-pool"><div id="poolB"></div></div>
+
+<!-- LIQUIDATION -->
+<div class="pg" id="pg-liq"><div id="liqB"></div></div>
+
+<!-- REDEMPTION -->
+<div class="pg" id="pg-redeem"><div id="redeemB"></div></div>
+
+</div>
+</div>
+<div id="tc"></div>
+
+<script>
+(function(){
+'use strict';
+
+// ═══════════════ CONFIG ═══════════════
+var CID='b8944fd3f6a62697a89b2a55acd1cb2e3893dadece99569706efa1da847dd440';
+var G=100000000; // GROTHS_IN_BEAM
+var CRIT=1.5, MCR=1.1, LIQ_RES=10, MIN_DEBT=10;
+var MIN_BORROW=0.005, MAX_BORROW=0.05, MIN_REDEEM=0.005;
+
+// ═══════════════ STATE ═══════════════
+var BEAM=null,SB=null,CID_=0,CB=new Map(),IL=false,RF=false,LR=0;
+var S=null,U=null,T=null; // contractState, userState, trovesState
+var curPg='home';
+
+// ═══════════════ NEPHRITE SVGs ═══════════════
+var nSvg='<img src="nph-coin.svg" style="width:22px;height:22px">';
+var bSvg='<img src="beam.svg" style="width:22px;height:22px">';
+
+// ═══════════════ WALLET API ═══════════════
+function init(){
+    if(IL)return;IL=true;
+    if(typeof qt!=='undefined'){var s=document.createElement('script');s.src='qrc:///qtwebchannel/qwebchannel.js';
+        s.onload=function(){new QWebChannel(qt.webChannelTransport,function(c){BEAM=c.objects.BEAM;if(!BEAM||!BEAM.api)return;
+            if(BEAM.api.callWalletApiResult&&typeof BEAM.api.callWalletApiResult.connect==='function')BEAM.api.callWalletApiResult.connect(onRes);
+            else if(typeof BEAM.api.callWalletApiResult==='function')BEAM.api.callWalletApiResult(onRes);
+            else BEAM.api.callWalletApiResult=onRes; ready();});};
+        s.onerror=function(){toast('WebChannel failed','er');};document.head.appendChild(s);
+    } else if(window.BEAM){BEAM=window.BEAM;
+        if(/android/i.test(navigator.userAgent))document.addEventListener('onCallWalletApiResult',function(e){onRes(e.detail)});
+        else if(typeof BEAM.callWalletApiResult==='function')BEAM.callWalletApiResult(onRes);
+        ready();
+    } else{$('connT').textContent='Open this DApp from within the Beam Wallet.';}
+}
+
+function api(m,p,cb){
+    if(!BEAM||!BEAM.api||!BEAM.api.callWalletApi){if(cb)cb({error:{message:'Not connected'}});return;}
+    var id=++CID_;CB.set(id,{c:cb,m:m});
+    try{BEAM.api.callWalletApi(JSON.stringify({jsonrpc:'2.0',id:id,method:m,params:p||{}}));}
+    catch(e){CB.delete(id);if(cb)cb({error:{message:e.message}});}
+}
+
+function onRes(j){
+    var a;try{a=typeof j==='string'?JSON.parse(j):j}catch(e){return}
+    if(a.result&&(a.result.ev_system_state||a.result.ev_txs_changed)){LR=0;refresh();}
+    var i=CB.get(a.id);if(!i)return;CB.delete(a.id);
+    if(a.error){if(i.c)i.c({error:a.error});return;}
+    var r=a.result;
+    if(r&&typeof r.output==='string'){
+        try{var p=JSON.parse(r.output);if(p.error){if(i.c)i.c({error:p.error});return;}
+        if(r.raw_data!==undefined)p.raw_data=r.raw_data;if(i.c)i.c(p);return;}
+        catch(e){if(i.c)i.c({error:'Parse error'});return;}
+    }
+    if(i.c)i.c(r);
+}
+
+function inv(args,cb){var p={args:args,create_tx:false};if(SB)p.contract=SB;api('invoke_contract',p,cb);}
+function ptx(raw,cb){api('process_invoke_data',{data:raw},cb);}
+
+function loadWasm(cb){
+    var x=new XMLHttpRequest();x.open('GET','nephriteAppShader.wasm',true);x.responseType='arraybuffer';
+    x.onload=function(){if(x.status===200||x.status===0){SB=Array.from(new Uint8Array(x.response));cb(null);}else cb('HTTP '+x.status);};
+    x.onerror=function(){cb('err');};x.send();
+}
+
+function eMsg(e){if(typeof e==='string')return e;if(e&&e.error&&typeof e.error==='object')return e.error.message||JSON.stringify(e.error);if(e&&typeof e.error==='string')return e.error;return(e&&e.message)||'Unknown error';}
+
+// Error code mapping (from original)
+var ERR_MAP={1:'Price is unavailable (oracle problem).',2:'Transaction will have no effect.',3:'There are too few NPH in the trove (less than 100).',4:'There are too few BEAMs in the trove.',5:'This operation is impossible because there is currently a recovery. This includes modifications that reduce TCR, as well as withdrawing from the stability pool.',6:'Redeem is currently impossible, too few suitable troves.',7:'There are troves that need to be liquidated first.'};
+function eHuman(e){var c=e&&e.error;if(typeof c==='number'&&ERR_MAP[c])return ERR_MAP[c];return eMsg(e);}
+
+// ═══════════════ LIFECYCLE ═══════════════
+function ready(){
+    $('connT').textContent='Loading shader...';
+    loadWasm(function(err){
+        if(err){toast('Shader: '+err,'er');return;}
+        $('connT').textContent='Loading state...';
+        refresh(function(){
+            $('conn').classList.add('hidden');
+            $('pg-home').classList.add('on');
+            api('ev_subunsub',{ev_system_state:true,ev_txs_changed:true},function(){});
+        });
+    });
+}
+
+function refresh(done){
+    var now=Date.now();if(now-LR<2000&&!done)return;if(RF&&!done)return;
+    RF=true;LR=now;var n=3;
+    function chk(){if(--n>0)return;RF=false;renderAll();if(done)done();}
+    inv('role=manager,action=view_params,cid='+CID,function(r){if(r&&!r.error)S=r.params||r;chk();});
+    inv('role=user,action=view,cid='+CID,function(r){if(r&&!r.error)U=r.res||r;else U=null;chk();});
+    inv('role=manager,action=view_all,cid='+CID,function(r){if(r&&!r.error)T=r.res||r;chk();});
+}
+
+function sched(){[3000,10000,30000].forEach(function(ms){setTimeout(function(){LR=0;refresh();},ms);});}
+
+function tx(args,btnId,msg){
+    var b=btnId?$(btnId):null;if(b){b.disabled=true;b.textContent='PREPARING...';}
+    inv(args,function(r){
+        if(!r||r.error){if(b){b.disabled=false;b.textContent=b.getAttribute('data-label')||'CONFIRM';}toast(eHuman(r),'er');return;}
+        if(r.raw_data){if(b)b.textContent='CONFIRM IN WALLET...';
+            ptx(r.raw_data,function(t){if(b){b.disabled=false;b.textContent=b.getAttribute('data-label')||'CONFIRM';}
+                if(t&&t.txid){toast(msg||'Transaction submitted','ok');sched();}else toast(eMsg(t)||'Failed','er');});
+        }else if(b){b.disabled=false;b.textContent=b.getAttribute('data-label')||'CONFIRM';}
+    });
+}
+
+// ═══════════════ FORMAT ═══════════════
+function fg(v){return v&&v!==0?Number(v)/G:0;} // fromGroths
+function tg(v){return v>0?Math.floor(v*G):0;} // toGroths
+function fmtB(v){if(v>=1e6)return(v/1e3).toFixed(1)+'K';if(v>=1000)return v.toLocaleString(undefined,{maximumFractionDigits:2});if(v>=1)return v.toFixed(2);if(v>0)return v.toFixed(8).replace(/0+$/,'').replace(/\.$/,'');return'0';}
+function fmtBF(v){return v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtP(v){var n=parseFloat(v);return isNaN(n)?'—':n.toFixed(1)+'%';}
+function fmtUSD(v){if(v>=1e6)return'$'+(v/1e6).toFixed(1)+'M';if(v>=1e3)return'$'+(v/1e3).toFixed(0)+'K';return'$'+v.toFixed(2);}
+function crC(cr){return cr>=150?'grn':cr>=110?'yel':'red';}
+
+// ═══════════════ RENDER ═══════════════
+function renderAll(){renderHome();if(curPg==='trove')renderTrove();if(curPg==='pool')renderPool();if(curPg==='liq')renderLiq();if(curPg==='redeem')renderRedeem();}
+
+function renderHome(){
+    if(!S)return;
+    var price=S.price?Number(S.price):0; // BEAM price — oracle returns float (NEPH/BEAM ≈ USD/BEAM), NOT groths
+    var totCol=S.totals?fg(S.totals.col):0;
+    var totTok=S.totals?fg(S.totals.tok):0;
+    var stabTok=S.stab_pool?fg(S.stab_pool.tok):0;
+    var stabPct=totTok>0?(stabTok/totTok*100).toFixed(1):'0';
+    var tcr=parseFloat(S.tcr);
+    var isRec=!isNaN(tcr)&&tcr<150;
+
+    // TVL = totalCollateral * price (but price is NEPH/BEAM, and 1 NPH=1 USD, so TVL in USD = totCol * price_per_beam_in_usd)
+    // From the contract, price represents how many NEPH you get per BEAM, so price = USD per BEAM
+    // TVL in USD = totCol * (price in USD) but price from oracle is already NEPH/BEAM ≈ USD/BEAM
+    var tvlUsd=totCol*price;
+    var tvlBeam=totCol;
+
+    $('hTvl').innerHTML=fmtUSD(tvlUsd)+'<small>'+fmtBF(tvlBeam)+' BEAM</small>';
+    // Use active troves count from view_all, not cumulative troves_created
+    var activeTroves=T&&T.troves?T.troves.length:(T&&T.troves_active?T.troves_active:0);
+    $('hTroves').textContent=activeTroves;
+    $('hSupply').textContent=fmtB(totTok);
+    $('hStab').textContent=fmtB(stabTok)+' ('+stabPct+'%)';
+    $('hTcr').textContent=fmtP(tcr);$('hTcr').className='sv '+crC(tcr);
+    // Issuance fee: issue_rate is already a percentage from contract
+    $('hFee').textContent=fmtP(S.issue_rate);
+    $('hRecov').textContent=isRec?'Yes':'No';$('hRecov').style.color=isRec?'#de3155':'';
+    // Recovery Mode Price Threshold = totalDebt * 1.5 / totalCollateral
+    if(totCol>0&&totTok>0){var rp=totTok*CRIT/totCol;$('hRecovP').textContent='$'+rp.toFixed(5);}
+    else $('hRecovP').textContent='—';
+
+    // My Position
+    var u=U;
+    if(u&&u.my_trove){
+        var myCol=fg(u.my_trove.amounts.col),myTok=fg(u.my_trove.amounts.tok);
+        var beamPrice=S&&S.price?Number(S.price):0;
+        // ICR = (collateral_in_beam * price_per_beam) / debt_in_nph * 100
+        var myIcr=beamPrice>0&&myTok>0?(myCol*beamPrice/myTok*100):0;
+        $('hIcr').textContent=myIcr>0?myIcr.toFixed(1)+'%':'–';$('hIcr').className='sv '+crC(myIcr);
+        $('hMyDebt').textContent=fmtB(myTok);
+        $('hTroveP').textContent='Manage your active trove';
+        $('hTroveB').textContent='MANAGE';
+    } else {
+        $('hIcr').textContent='–';$('hIcr').className='sv';
+        $('hMyDebt').textContent='–';
+        $('hTroveP').textContent="You haven't borrow any Nephrite yet? To get it you need to open a Trove.";
+        $('hTroveB').textContent='OPEN';
+    }
+    if(u&&u.stab&&fg(u.stab.tok)>0)$('hMyStab').textContent=fmtB(fg(u.stab.tok));
+    else $('hMyStab').textContent='–';
+}
+
+// ═══════════════ TROVE PAGE ═══════════════
+function renderTrove(){
+    var el=$('troveB'),u=U,s=S;
+    var has=u&&u.my_trove;
+    var curCol=has?fg(u.my_trove.amounts.col):0;
+    var curTok=has?fg(u.my_trove.amounts.tok):0;
+    var liqRes=s&&s.liq_reserve?fg(s.liq_reserve):LIQ_RES;
+    var minDebt=s&&s.min_debt?fg(s.min_debt):MIN_DEBT;
+    var minNet=minDebt>liqRes?(minDebt-liqRes):minDebt;
+    var price=s&&s.price?Number(s.price):0;
+
+    var h='<div class="hdr"><button class="hdr-back" onclick="go(\'home\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> back</button><span class="hdr-t">'+(has?'Adjust Trove':'Open Trove')+'</span><span class="hdr-sp"></span></div>';
+    h+='<div class="ic"><div class="ic-l" id="tColLabel">Collateral amount (min 0 BEAM)</div><div class="ic-r"><input type="number" class="ic-i" id="tCol" placeholder="0" step="any" min="0" value="'+(has?curCol.toFixed(2):'')+'"><div class="ic-d"></div><div class="ic-u">'+bSvg+' BEAM</div></div><div class="ic-sub" id="tColUsd"></div></div>';
+    h+='<div class="ic"><div class="ic-l">Issuing volume (min '+minNet+' NPH)</div><div class="ic-r"><input type="number" class="ic-i" id="tTok" placeholder="'+minNet+'" step="any" min="0" value="'+(has?Math.max(0,curTok-liqRes).toFixed(2):minNet)+'"><div class="ic-d"></div><div class="ic-u">'+nSvg+' NPH</div></div><div class="ic-sub" id="tTokUsd"></div></div>';
+    h+='<div id="tPred"></div><div id="tWarn"></div>';
+    h+='<div class="br"><button class="btn btn-gr" onclick="go(\'home\')">CANCEL</button><button class="btn btn-g" id="btnTC" data-label="CONFIRM" onclick="doTC()">CONFIRM</button></div>';
+    if(has)h+='<div style="padding:0 12px;margin-top:6px"><button class="btn btn-r" onclick="doCloseTrove()">CLOSE TROVE</button></div>';
+    el.innerHTML=h;
+
+    var ci=$('tCol'),ti=$('tTok'),db;
+    function pred(){clearTimeout(db);db=setTimeout(doPred,400);}
+    function updateUsd(){
+        var cv=parseFloat(ci.value)||0,tv=parseFloat(ti.value)||0;
+        $('tColUsd').textContent=price>0?(cv*price).toFixed(2)+' USD':'';
+        $('tTokUsd').textContent=tv>0?tv.toFixed(2)+' USD':'';
+    }
+    ci.addEventListener('input',function(){updateUsd();pred();});
+    ti.addEventListener('input',function(){updateUsd();pred();});
+
+    // Auto-fill: for new trove, predict collateral for 120% ICR with min debt
+    if(!has){
+        var initTok=tg(minNet+liqRes); // total debt in groths
+        inv('role=user,action=trove_modify,bPredictOnly=1,tok='+initTok+',col=0,opTok=0,opCol=0,tcr_mperc=120000,bAutoTok=0,cid='+CID,function(r){
+            if(r&&!r.error&&r.prediction){
+                var autoCol=fg(r.prediction.amounts.col);
+                ci.value=Math.ceil(autoCol);
+                $('tColLabel').textContent='Collateral amount (min '+Math.ceil(autoCol)+' BEAM)';
+                updateUsd();
+                doPred();
+            }
+        });
+    } else {
+        updateUsd();
+        setTimeout(doPred,100);
+    }
+}
+
+function doPred(){
+    var col=tg($('tCol').value||0);
+    var netTok=parseFloat($('tTok').value||0);
+    var liqRes=S&&S.liq_reserve?fg(S.liq_reserve):LIQ_RES;
+    var tok=tg(netTok+liqRes); // total debt = net debt + liquidation reserve
+    inv('role=user,action=trove_modify,bPredictOnly=1,tok='+tok+',col='+col+',opTok=0,opCol=0,tcr_mperc=0,bAutoTok=0,cid='+CID,function(r){
+        var box=$('tPred'),warn=$('tWarn');
+        if(!r||r.error){box.innerHTML='';warn.innerHTML='<div class="wb">'+eHuman(r)+'</div>';return;}
+        var p=r.prediction;var cr=parseFloat(p.cr);var fee=p.fee?fg(p.fee):0;var fpct=p.fee_perc?parseFloat(p.fee_perc):0;
+        var liqRes=S&&S.liq_reserve?fg(S.liq_reserve):LIQ_RES;
+        var totalDebt=fg(p.amounts.tok);
+        var iS='<svg viewBox="0 0 512 512" fill="currentColor"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-176a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>';
+        box.innerHTML='<div class="ir"><span class="sl">ICR <span class="ii" data-tip="The Individual Collateral Ratio (ICR) is the ratio of the USD value of your Trove collateral to your Trove debt.">'+iS+'</span></span><span class="sv" style="'+(!isNaN(cr)?'color:'+(cr>=150?'#527B0B':cr>=110?'#b8860b':'#de3155'):'')+'">'+fmtP(cr)+'</span></div>'+
+            '<div class="ir"><span class="sl">Liquidation Reserve <span class="ii" data-tip="An amount set aside to cover the liquidator gas costs if your Trove needs to be liquidated. The amount increases your debt and is refunded if you close your Trove by fully paying off its net debt.">'+iS+'</span></span><span class="sv">'+liqRes+' NPH</span></div>'+
+            '<div class="ir"><span class="sl">Issuance fee <span class="ii" data-tip="The Issuance Fee is a one-off fee charged as a percentage of the borrowed amount (in BEAM). The fee varies between 0.5% and 5%.">'+iS+'</span></span><span class="sv">'+fee.toFixed(2)+' NPH ('+fpct.toFixed(1)+'%)</span></div>'+
+            '<div class="ir"><span class="sl">Total debt <span class="ii" data-tip="The total amount of NPH your Trove will hold, including your debt and the Liquidation Reserve.">'+iS+'</span></span><span class="sv">'+totalDebt.toFixed(2)+' NPH</span></div>';
+        var w='';
+        if(!isNaN(cr)&&cr<110)w+='<div class="wb">ICR should be more than <b>110%</b>.</div>';
+        if(!isNaN(cr)&&cr>=110&&cr<150)w+='<div class="hb">Keeping your ICR above <b>150%</b> can help avoid liquidation under Recovery Mode</div>';
+        warn.innerHTML=w;
+    });
+}
+
+function doTC(){
+    var col=tg($('tCol').value||0);
+    var netTok=parseFloat($('tTok').value||0);
+    var liqRes=S&&S.liq_reserve?fg(S.liq_reserve):LIQ_RES;
+    var tok=tg(netTok+liqRes);
+    tx('role=user,action=trove_modify,bPredictOnly=0,tok='+tok+',col='+col+',opTok=0,opCol=0,tcr_mperc=0,bAutoTok=0,cid='+CID,'btnTC','Trove updated');
+}
+function doCloseTrove(){
+    tx('role=user,action=trove_modify,bPredictOnly=0,tok=0,col=0,opTok=0,opCol=0,tcr_mperc=0,bAutoTok=0,cid='+CID,null,'Trove closed');
+    toast('Closing trove...','in');
+}
+
+// ═══════════════ POOL PAGE ═══════════════
+function renderPool(){
+    var el=$('poolB'),u=U;
+    var curStab=u&&u.stab?fg(u.stab.tok):0;
+    var h='<div class="hdr"><button class="hdr-back" onclick="go(\'home\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> back</button><span class="hdr-t">Deposit to Stability Pool</span><span class="hdr-sp"></span></div>';
+    h+='<div class="ic"><div class="ic-l">Amount</div><div class="ic-r"><input type="number" class="ic-i" id="pAmt" placeholder="0" step="any" min="0" value="'+(curStab>0?curStab.toFixed(2):'')+'"><div class="ic-d"></div><div class="ic-u">'+nSvg+' NPH</div></div></div>';
+
+    if(u&&u.stab&&(fg(u.stab.col)>0||fg(u.stab.gov)>0)){
+        h+='<div class="cd">';
+        if(fg(u.stab.col)>0)h+='<div class="sr"><span class="sl">Earned BEAM</span><span class="sv">'+fmtB(fg(u.stab.col))+' BEAM</span></div>';
+        if(fg(u.stab.gov)>0)h+='<div class="sr"><span class="sl">Earned BEAMX</span><span class="sv">'+fmtB(fg(u.stab.gov))+' BEAMX</span></div>';
+        h+='</div>';
+    }
+
+    var hasSurp=u&&((u['surplus-t']&&(fg(u['surplus-t'].tok)>0||fg(u['surplus-t'].col)>0||fg(u['surplus-t'].gov)>0))||(u.surplus_s&&(fg(u.surplus_s.tok)>0||fg(u.surplus_s.col)>0||fg(u.surplus_s.gov)>0)));
+    if(hasSurp){
+        h+='<div class="cd"><div class="cd-t" style="font-size:11px">Claimable Surplus</div>';
+        var st=u['surplus-t']||{},ss=u.surplus_s||{};
+        if(fg(st.col||0)+fg(ss.col||0)>0)h+='<div class="sr"><span class="sl">BEAM</span><span class="sv">'+fmtB(fg(st.col||0)+fg(ss.col||0))+'</span></div>';
+        if(fg(st.tok||0)+fg(ss.tok||0)>0)h+='<div class="sr"><span class="sl">NPH</span><span class="sv">'+fmtB(fg(st.tok||0)+fg(ss.tok||0))+'</span></div>';
+        if(fg(st.gov||0)+fg(ss.gov||0)>0)h+='<div class="sr"><span class="sl">BEAMX</span><span class="sv">'+fmtB(fg(st.gov||0)+fg(ss.gov||0))+'</span></div>';
+        h+='<button class="btn btn-g" style="margin-top:8px" id="btnCS" data-label="CLAIM" onclick="doCS()">CLAIM</button></div>';
+    }
+
+    h+='<div class="br"><button class="btn btn-gr" onclick="go(\'home\')">CANCEL</button><button class="btn btn-g" id="btnPC" data-label="CONFIRM" onclick="doPC()">CONFIRM</button></div>';
+    h+='<div class="nb"><b>Please note</b> that the purpose of the Stability pool is to act as a collective liquidator of risky troves. Consequently, when there are risky troves in the system – withdrawals from the Stability pool are disabled until the liquidation of these troves. By depositing your NPH to the Stability pool, you provide the right to use these NPH for liquidations to the system.</div>';
+    el.innerHTML=h;
+}
+
+function doPC(){var v=tg($('pAmt').value||0);tx('role=user,action=upd_stab,newVal='+v+',cid='+CID,'btnPC','Stability pool updated');}
+function doCS(){tx('role=user,action=withdraw_surplus,cid='+CID,'btnCS','Surplus withdrawn');}
+
+// ═══════════════ LIQUIDATION PAGE ═══════════════
+function renderLiq(){
+    var el=$('liqB');
+    var troves=T&&T.troves?T.troves:[];
+    var price=S&&S.price?Number(S.price):0;
+    var h='<div class="hdr"><button class="hdr-back" onclick="go(\'home\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> back</button><span class="hdr-t">Liquidation</span><span class="hdr-sp"></span></div>';
+    h+='<div class="cd">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:800;color:#204501;letter-spacing:1px;text-transform:uppercase;font-size:12px">Risky Troves</div><button class="btn btn-g btn-s" id="btnLQ" data-label="INITIATE LIQUIDATION" onclick="doLQ()">INITIATE LIQUIDATION</button></div>';
+    if(troves.length>0){
+        h+='<div style="overflow-x:auto"><table class="tb"><thead><tr><th>#</th><th>Collateral<br><span style="font-weight:400">(BEAM)</span></th><th>Debt<br><span style="font-weight:400">(NPH)</span></th><th>Collateral Ratio</th></tr></thead><tbody>';
+        for(var i=0;i<troves.length;i++){
+            var t=troves[i],cr=parseFloat(t.cr);
+            var isMe=U&&U.my_trove&&Number(t.amounts.tok)===Number(U.my_trove.amounts.tok)&&Number(t.amounts.col)===Number(U.my_trove.amounts.col);
+            h+='<tr'+(isMe?' class="me"':'')+'><td>'+(i+1)+'</td><td>'+fmtBF(fg(t.amounts.col))+'</td><td>'+fmtBF(fg(t.amounts.tok))+'</td><td style="'+(cr>=150?'color:#527B0B':cr>=110?'color:#b8860b':'color:#de3155')+'">'+fmtP(cr)+'</td></tr>';
+        }
+        h+='</tbody></table></div>';
+    } else h+='<div style="text-align:center;color:var(--txt2);padding:16px">No active troves</div>';
+    h+='</div>';
+    el.innerHTML=h;
+}
+
+function doLQ(){tx('role=user,action=liquidate,bPredictOnly=0,nMaxTroves=10,cid='+CID,'btnLQ','Liquidation executed');}
+
+// ═══════════════ REDEMPTION PAGE ═══════════════
+function renderRedeem(){
+    var el=$('redeemB');
+    var h='<div class="hdr"><button class="hdr-back" onclick="go(\'home\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> back</button><span class="hdr-t">Redemption</span><span class="hdr-sp"></span></div>';
+    h+='<div class="ic"><div class="ic-l">Amount</div><div class="ic-r"><input type="number" class="ic-i" id="rAmt" placeholder="0" step="any" min="0"><div class="ic-d"></div><div class="ic-u">'+nSvg+' NPH</div></div></div>';
+    h+='<div class="ir"><span class="sl">Redemption fee</span><span class="sv" id="rFee">0.00 BEAM (0%)</span></div>';
+    h+='<div id="rPred"></div>';
+    h+='<div class="br"><button class="btn btn-gr" onclick="go(\'home\')">CANCEL</button><button class="btn btn-g" id="btnRC" data-label="CONFIRM" onclick="doRC()">CONFIRM</button></div>';
+    el.innerHTML=h;
+    var ri=$('rAmt'),db;
+    if(ri)ri.addEventListener('input',function(){clearTimeout(db);db=setTimeout(doRP,400);});
+}
+
+function doRP(){
+    var v=tg($('rAmt').value||0);if(v<=0)return;
+    inv('role=user,action=redeem,bPredictOnly=1,val='+v+',cid='+CID,function(r){
+        var fe=$('rFee');
+        if(!r||r.error){fe.textContent=eHuman(r);return;}
+        var p=r.prediction;fe.textContent=fg(p.fee).toFixed(2)+' BEAM ('+parseFloat(p.fee_perc).toFixed(1)+'%)';
+    });
+}
+function doRC(){var v=tg($('rAmt').value||0);if(v<=0){toast('Enter an amount','in');return;}tx('role=user,action=redeem,bPredictOnly=0,val='+v+',cid='+CID,'btnRC','Redemption executed');}
+
+// ═══════════════ NAVIGATION ═══════════════
+function go(pg){
+    curPg=pg;
+    var all=document.querySelectorAll('.pg');for(var i=0;i<all.length;i++)all[i].classList.remove('on');
+    $('pg-'+pg).classList.add('on');
+    document.querySelector('.pages').scrollTop=0;
+    if(pg==='trove')renderTrove();else if(pg==='pool')renderPool();else if(pg==='liq')renderLiq();else if(pg==='redeem')renderRedeem();
+}
+
+// ═══════════════ HELPERS ═══════════════
+function $(id){return document.getElementById(id);}
+function toast(m,t){var c=$('tc'),e=document.createElement('div');e.className='tt '+(t||'in');e.textContent=m;c.appendChild(e);setTimeout(function(){e.style.opacity='0';e.style.transition='opacity .3s';setTimeout(function(){if(e.parentNode)e.parentNode.removeChild(e)},300)},3000);}
+// Tooltip: tap to show, tap anywhere else to close
+var activeTip=null;
+function tipShow(el,msg){
+    tipHide();
+    var tp=document.createElement('div');tp.className='tp on';tp.textContent=msg;
+    el.parentElement.appendChild(tp);activeTip=tp;
+    requestAnimationFrame(function(){if(tp.getBoundingClientRect().right>window.innerWidth-8){tp.style.left='auto';tp.style.right='0';}});
+}
+function tipHide(){if(activeTip&&activeTip.parentNode){activeTip.parentNode.removeChild(activeTip);activeTip=null;}}
+function tipSetup(){
+    document.addEventListener('click',function(e){
+        var ii=e.target.closest('.ii');
+        if(ii){
+            e.stopPropagation();
+            var msg=ii.getAttribute('data-tip')||'';
+            if(activeTip&&activeTip.parentElement===ii.parentElement){tipHide();}
+            else{tipShow(ii,msg);}
+        } else {tipHide();}
+    });
+}
+
+// ═══════════════ EXPOSE + INIT ═══════════════
+window.go=go;window.doTC=doTC;window.doCloseTrove=doCloseTrove;window.doPC=doPC;window.doCS=doCS;window.doLQ=doLQ;window.doRC=doRC;
+document.addEventListener('DOMContentLoaded',function(){init();tipSetup();});
+})();
+</script>
+</body>
+</html>

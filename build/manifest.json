@@ -1,0 +1,11 @@
+{
+  "name": "Nephrite Mobile",
+  "description": "Nephrite Stablecoin — Mobile-optimized UI for managing troves, stability pool, liquidations, and redemptions.",
+  "url": "localapp/app/index.html",
+  "icon": "localapp/app/appicon.svg",
+  "version": "1.0.0",
+  "api_version": "7.0",
+  "min_api_version": "6.0",
+  "guid": "a3f7c1e8d4b2094f6e5a8d1c7b3f9e02",
+  "category": 2
+}

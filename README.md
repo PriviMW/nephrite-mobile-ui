@@ -1,6 +1,6 @@
 # Nephrite Mobile UI
 
-A lightweight, mobile-optimized DApp UI for the [Nephrite](https://nephrite.io) confidential stablecoin protocol on the [Beam](https://beam.mw) blockchain.
+A lightweight, mobile-optimized DApp UI for the Nephrite confidential stablecoin protocol on the [Beam](https://beam.mw) blockchain.
 
 Nephrite is a collateralized stablecoin system (similar to Liquity) where users can open Troves, deposit collateral (BEAM), and borrow NPH stablecoins pegged to $1 USD.
 
@@ -39,7 +39,7 @@ Nephrite is a collateralized stablecoin system (similar to Liquity) where users 
 ## Technical Details
 
 - **Single-file vanilla JS** — no frameworks, no build step (~39KB packaged)
-- **Same contract** as the official Nephrite DApp (CID: `b8944fd3...`)
+- **Same contract** as the official Nephrite DApp (CID: `b8944fd3f6a62697a89b2a55acd1cb2e3893dadece99569706efa1da847dd440`)
 - **Same app shader** (`nephriteAppShader.wasm`)
 - Compatible with Beam Desktop Wallet (Qt WebChannel) and Android WebView (PriviMW Wallet)
 - Event-driven refresh via `ev_subunsub` (no polling)
@@ -78,10 +78,6 @@ cd build
 
 ### From .dapp file
 Install `releases/NephriteMobile.dapp` in the Beam Desktop Wallet or PriviMW Wallet via the DApp manager.
-
-### From localhost (development)
-1. Serve the `build/app/` directory on localhost
-2. Open from Beam Wallet's DApp browser pointing to `http://localhost:<port>/index.html`
 
 ## Nephrite Protocol
 
